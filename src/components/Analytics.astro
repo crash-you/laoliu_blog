@@ -1,0 +1,28 @@
+---
+/**
+ * 百度统计组件
+ * 
+ * 使用前需要：
+ * 1. 在百度统计注册并添加网站
+ * 2. 获取统计代码中的 ID
+ * 3. 替换下方的 BAIDU_ANALYTICS_ID
+ * 
+ * 文档：https://tongji.baidu.com/
+ */
+
+// TODO: 替换为你的百度统计ID
+// 从百度统计代码中提取，格式类似：abc123def456
+const BAIDU_ANALYTICS_ID = 'YOUR_BAIDU_ANALYTICS_ID';
+---
+
+{BAIDU_ANALYTICS_ID !== 'YOUR_BAIDU_ANALYTICS_ID' && (
+  <script is:inline define:vars={{ BAIDU_ANALYTICS_ID }}>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?" + BAIDU_ANALYTICS_ID;
+      var s = document.getElementsByTagName("script")[0]; 
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+)}

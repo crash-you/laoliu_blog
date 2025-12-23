@@ -1,0 +1,176 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout 
+  title="搜索 - 老刘的生财之道" 
+  description="在老刘的生财之道中搜索文章和项目"
+>
+  <section class="search-page">
+    <div class="content-container">
+      <h1>🔍 搜索</h1>
+      <p class="search-intro">输入关键词，搜索全站内容</p>
+      
+      <!-- Pagefind Search UI -->
+      <div id="search" class="pagefind-container"></div>
+      
+      <!-- 加载提示 -->
+      <div id="search-loading" class="search-hint">
+        <p>正在加载搜索功能...</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .search-page {
+    padding: 3rem 0 4rem;
+    min-height: 70vh;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .search-intro {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+  }
+  
+  .pagefind-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  /* Pagefind UI 样式覆盖 */
+  :global(.pagefind-ui) {
+    --pagefind-ui-scale: 1;
+    --pagefind-ui-primary: var(--primary);
+    --pagefind-ui-text: var(--text-primary);
+    --pagefind-ui-background: var(--bg-secondary);
+    --pagefind-ui-border: var(--border-color);
+    --pagefind-ui-tag: var(--bg-tertiary);
+    --pagefind-ui-border-width: 2px;
+    --pagefind-ui-border-radius: 8px;
+    --pagefind-ui-font: var(--font-sans);
+  }
+  
+  :global(.pagefind-ui__search-input) {
+    padding: 1rem 1.25rem !important;
+    font-size: 1rem !important;
+    border-radius: var(--radius) !important;
+  }
+  
+  :global(.pagefind-ui__search-input:focus) {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(26, 54, 93, 0.1) !important;
+  }
+  
+  :global(.pagefind-ui__result) {
+    padding: 1rem !important;
+    border-radius: var(--radius) !important;
+    margin-bottom: 0.75rem !important;
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+  }
+  
+  :global(.pagefind-ui__result:hover) {
+    border-color: var(--primary) !important;
+  }
+  
+  :global(.pagefind-ui__result-title) {
+    font-weight: 600 !important;
+    color: var(--text-primary) !important;
+  }
+  
+  :global(.pagefind-ui__result-link:hover .pagefind-ui__result-title) {
+    color: var(--primary) !important;
+  }
+  
+  :global(.pagefind-ui__result-excerpt) {
+    color: var(--text-secondary) !important;
+  }
+  
+  :global(mark.pagefind-ui__result-highlight) {
+    background: var(--accent) !important;
+    color: var(--primary-dark) !important;
+    padding: 0 2px !important;
+    border-radius: 2px !important;
+  }
+  
+  .search-hint {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 3rem;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .search-hint.hidden {
+    display: none;
+  }
+  
+  .search-hint code {
+    background: var(--bg-secondary);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+  }
+</style>
+
+<script is:inline>
+  // 在页面加载后初始化 Pagefind
+  document.addEventListener('DOMContentLoaded', async function() {
+    const container = document.getElementById('search');
+    const loading = document.getElementById('search-loading');
+    
+    if (!container) return;
+    
+    try {
+      // 加载 Pagefind CSS
+      const cssLink = document.createElement('link');
+      cssLink.rel = 'stylesheet';
+      cssLink.href = '/pagefind/pagefind-ui.css';
+      document.head.appendChild(cssLink);
+      
+      // 加载 Pagefind JS
+      const script = document.createElement('script');
+      script.src = '/pagefind/pagefind-ui.js';
+      script.onload = function() {
+        // 隐藏加载提示
+        if (loading) loading.classList.add('hidden');
+        
+        // 初始化搜索 UI
+        new PagefindUI({
+          element: '#search',
+          showImages: false,
+          showSubResults: true,
+          translations: {
+            placeholder: '搜索文章、项目、故事...',
+            zero_results: '没有找到相关结果',
+            many_results: '找到 [COUNT] 个结果',
+            one_result: '找到 1 个结果',
+            alt_search: '没有找到结果，尝试搜索 [TERM]',
+            search_suggestion: '没有找到结果，尝试以下搜索：',
+            searching: '搜索中...',
+          },
+        });
+      };
+      script.onerror = function() {
+        // 显示未构建提示
+        if (loading) {
+          loading.innerHTML = '<p>💡 搜索功能在站点构建后可用</p><p>运行 <code>npm run build</code> 后刷新页面</p>';
+        }
+      };
+      document.head.appendChild(script);
+    } catch (e) {
+      console.error('Pagefind 加载失败:', e);
+      if (loading) {
+        loading.innerHTML = '<p>⚠️ 搜索功能加载失败</p>';
+      }
+    }
+  });
+</script>

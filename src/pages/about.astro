@@ -1,63 +1,202 @@
 ---
-import AboutHeroImage from '../assets/blog-placeholder-about.jpg';
-import Layout from '../layouts/BlogPost.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SOCIAL_LINKS } from '../consts';
 ---
 
-<Layout
-	title="About Me"
-	description="Lorem ipsum dolor sit amet"
-	pubDate={new Date('August 08 2021')}
-	heroImage={AboutHeroImage}
+<BaseLayout 
+  title="关于老刘 - 老刘的生财之道" 
+  description="了解老刘是谁，为什么做这个网站，以及如何联系老刘"
 >
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-		labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo
-		viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam
-		adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus
-		et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus
-		vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque
-		sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
-	</p>
+  <section class="about-page">
+    <div class="content-container">
+      <!-- Hero Section -->
+      <header class="about-header">
+        <div class="avatar">👨‍💻</div>
+        <h1>关于老刘</h1>
+        <p class="tagline">分享互联网赚钱的门道，助你找到属于自己的生财之道</p>
+      </header>
+      
+      <!-- Main Content -->
+      <div class="prose about-content">
+        <h2>👋 你好，我是老刘</h2>
+        
+        <p>
+          一个在互联网上摸爬滚打多年的老兵。我做过电商、玩过流量、研究过各种副业项目，有成功的经验，也有失败的教训。
+        </p>
+        
+        <p>
+          现在，我把这些年积累的经验和思考，沉淀到这个网站里，希望能帮到正在寻找机会的你。
+        </p>
+        
+        <h2>🎯 这个网站的目的</h2>
+        
+        <p>
+          说实话，我做这个网站主要有两个原因：
+        </p>
+        
+        <h3>1. 知识沉淀</h3>
+        <p>
+          之前写的内容散落在各个平台，微信公众号、知乎、小红书……万一哪天账号出问题，多年的积累就可能付之东流。把内容放在自己的独立站，心里踏实。
+        </p>
+        
+        <h3>2. 系统分享</h3>
+        <p>
+          在自己的地盘，可以更系统地组织内容，不用考虑平台的推荐算法。你想看什么，直接按分类找就行。
+        </p>
+        
+        <h2>📝 这里有什么内容</h2>
+        
+        <h3>深度长文</h3>
+        <p>
+          关于互联网赚钱的底层逻辑、思维方式、方法论。不是鸡汤，是可以直接落地的干货。
+        </p>
+        
+        <h3>项目拆解</h3>
+        <p>
+          各种互联网项目的详细拆解，包括商业模式分析、操作流程、注意事项。每个项目都标注了难度等级和预估收入，帮你快速判断是否适合自己。
+        </p>
+        
+        <h2>📱 如何联系我</h2>
+        
+        <p>
+          有问题可以在文章下方评论，我会尽量回复每一条。
+        </p>
+        
+        <p>
+          也欢迎关注我的微信公众号「{SOCIAL_LINKS.wechat}」，获取更多内容和第一时间更新通知。
+        </p>
+        
+        <div class="contact-card">
+          <div class="wechat-section">
+            <span class="icon">📱</span>
+            <div class="info">
+              <p class="label">微信公众号</p>
+              <p class="value">{SOCIAL_LINKS.wechat}</p>
+            </div>
+          </div>
+          <!-- 这里可以放公众号二维码图片 -->
+        </div>
+        
+        <h2>💡 一些建议</h2>
+        
+        <p>
+          如果你是第一次来，建议从<a href="/articles">深度长文</a>开始看，先建立正确的认知和思维方式。
+        </p>
+        
+        <p>
+          如果你已经有一定基础，想找具体可操作的项目，直接去<a href="/projects">项目拆解</a>区看看。
+        </p>
+        
+        <p>
+          记住：没有一夜暴富的捷径，但有正确的方法和持续的行动。
+        </p>
+        
+        <hr />
+        
+        <p class="closing">
+          感谢你的阅读，希望在这里能帮到你。<br />
+          有什么想法或建议，随时留言告诉我。
+        </p>
+        
+        <p class="signature">
+          —— 老刘
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
 
-	<p>
-		Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non
-		tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non
-		blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna
-		porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis
-		massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc.
-		Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis
-		bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra
-		massa massa ultricies mi.
-	</p>
-
-	<p>
-		Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl
-		suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet
-		nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae
-		turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem
-		dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat
-		semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus
-		vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum
-		facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam
-		vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla
-		urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
-	</p>
-
-	<p>
-		Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper
-		viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc
-		scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur
-		gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus
-		pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim
-		blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id
-		cursus metus aliquam eleifend mi.
-	</p>
-
-	<p>
-		Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta
-		nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam
-		tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci
-		ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar
-		proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
-	</p>
-</Layout>
+<style>
+  .about-page {
+    padding: 3rem 0 4rem;
+  }
+  
+  .about-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .avatar {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .about-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .tagline {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  
+  .about-content h2 {
+    margin-top: 2.5rem;
+    color: var(--primary);
+  }
+  
+  .about-content h2:first-child {
+    margin-top: 0;
+  }
+  
+  .about-content h3 {
+    margin-top: 1.5rem;
+    color: var(--text-primary);
+  }
+  
+  .contact-card {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+  }
+  
+  .wechat-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .wechat-section .icon {
+    font-size: 2.5rem;
+  }
+  
+  .wechat-section .label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+  }
+  
+  .wechat-section .value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin: 0;
+  }
+  
+  .closing {
+    font-style: italic;
+    color: var(--text-secondary);
+  }
+  
+  .signature {
+    text-align: right;
+    font-weight: 600;
+    color: var(--primary);
+    margin-top: 2rem;
+  }
+  
+  @media (max-width: 768px) {
+    .about-header h1 {
+      font-size: 2rem;
+    }
+    
+    .avatar {
+      font-size: 4rem;
+    }
+  }
+</style>

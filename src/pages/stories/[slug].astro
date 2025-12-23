@@ -1,0 +1,218 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { STORY_CATEGORIES } from '../../consts';
+
+export async function getStaticPaths() {
+  const stories = await getCollection('stories');
+  return stories.map((story) => ({
+    params: { slug: story.id },
+    props: { story },
+  }));
+}
+
+const { story } = Astro.props;
+const { Content } = await render(story);
+const categoryInfo = STORY_CATEGORIES.find(c => c.slug === story.data.category) || { name: story.data.category };
+---
+
+<BaseLayout 
+  title={`${story.data.title} - 学员故事`} 
+  description={story.data.description}
+>
+  <article class="story-page">
+    <div class="content-container">
+      <!-- Story Header -->
+      <header class="story-header">
+        <div class="story-meta">
+          <span class="category-tag">{categoryInfo.name}</span>
+          <span class="date">
+            <FormattedDate date={story.data.pubDate} />
+          </span>
+        </div>
+        
+        <h1 class="story-title">{story.data.title}</h1>
+        
+        <p class="story-description">{story.data.description}</p>
+        
+        <!-- Story Stats -->
+        <div class="story-stats">
+          {story.data.author && (
+            <div class="stat">
+              <span class="stat-icon">👤</span>
+              <span class="stat-value">{story.data.author}</span>
+            </div>
+          )}
+          {story.data.income && (
+            <div class="stat highlight">
+              <span class="stat-icon">💰</span>
+              <span class="stat-value">{story.data.income}</span>
+            </div>
+          )}
+          {story.data.duration && (
+            <div class="stat">
+              <span class="stat-icon">⏱️</span>
+              <span class="stat-value">{story.data.duration}</span>
+            </div>
+          )}
+        </div>
+      </header>
+      
+      <!-- Story Content -->
+      <div class="prose story-content">
+        <Content />
+      </div>
+      
+      <!-- CTA Section -->
+      <section class="cta-section">
+        <div class="cta-card">
+          <h3>📖 想了解更多成功案例？</h3>
+          <p>加入老刘的知识库，获取更多真实案例和实战经验</p>
+          <p class="price">¥298/年 · 持续更新</p>
+          <p class="contact">👉 微信搜索「老刘说钱」咨询</p>
+        </div>
+      </section>
+      
+      <!-- Comments Placeholder -->
+      <section class="comments-section" id="comments">
+        <h3>💬 评论区</h3>
+        <div class="comments-placeholder">
+          <p>评论系统正在接入中...</p>
+        </div>
+      </section>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .story-page {
+    padding: 2rem 0 4rem;
+  }
+  
+  .story-header {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .story-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+  
+  .category-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: #38a169;
+    color: white;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+  }
+  
+  .story-title {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+  
+  .story-description {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+  }
+  
+  .story-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+  
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius);
+  }
+  
+  .stat.highlight {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    color: var(--primary-dark);
+    font-weight: 600;
+  }
+  
+  .stat-icon {
+    font-size: 1.25rem;
+  }
+  
+  .story-content {
+    margin-bottom: 3rem;
+  }
+  
+  /* CTA Section */
+  .cta-section {
+    margin: 3rem 0;
+  }
+  
+  .cta-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    text-align: center;
+  }
+  
+  .cta-card h3 {
+    margin: 0 0 0.5rem 0;
+    color: white;
+  }
+  
+  .cta-card p {
+    margin: 0.5rem 0;
+    color: rgba(255,255,255,0.9);
+  }
+  
+  .cta-card .price {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  
+  .cta-card .contact {
+    font-weight: 500;
+  }
+  
+  /* Comments */
+  .comments-section {
+    border-top: 1px solid var(--border-color);
+    padding-top: 2rem;
+  }
+  
+  .comments-placeholder {
+    text-align: center;
+    padding: 2rem;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+  }
+  
+  @media (max-width: 768px) {
+    .story-title {
+      font-size: 1.75rem;
+    }
+    
+    .story-stats {
+      gap: 0.75rem;
+    }
+    
+    .stat {
+      padding: 0.375rem 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+</style>

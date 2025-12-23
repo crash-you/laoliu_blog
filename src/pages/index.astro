@@ -1,49 +1,480 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { getCollection } from 'astro:content';
+import { SITE_TITLE, SITE_DESCRIPTION, ARTICLE_CATEGORIES, PROJECT_CATEGORIES } from '../consts';
+
+// 获取所有文章和项目
+const allArticles = await getCollection('articles', ({ data }) => !data.draft);
+const allProjects = await getCollection('projects', ({ data }) => !data.draft);
+
+// 排序并获取最新内容
+const latestArticles = allArticles
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const latestProjects = allProjects
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+// 获取精选内容
+const featuredContent = [...allArticles, ...allProjects]
+  .filter(item => item.data.featured)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 4);
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION}>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-badge">💰 知识沉淀 · 持续更新</span>
+        <h1 class="hero-title">
+          老刘的<span class="highlight">生财之道</span>
+        </h1>
+        <p class="hero-description">
+          深度长文 · 项目拆解 · 互联网赚钱方法论<br />
+          帮你找到属于自己的生财之道
+        </p>
+        <div class="hero-actions">
+          <a href="/articles" class="btn btn-primary">
+            📚 开始阅读
+          </a>
+          <a href="/about" class="btn btn-outline">
+            👋 认识老刘
+          </a>
+        </div>
+        
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-number">{allArticles.length}</span>
+            <span class="stat-label">篇深度长文</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">{allProjects.length}</span>
+            <span class="stat-label">个项目拆解</span>
+          </div>
+          <div class="stat">
+            <span class="stat-number">{ARTICLE_CATEGORIES.length + PROJECT_CATEGORIES.length}</span>
+            <span class="stat-label">个内容分类</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Featured Section -->
+  {featuredContent.length > 0 && (
+    <section class="section featured-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>⭐ 精选推荐</h2>
+          <p>老刘精心挑选的优质内容</p>
+        </div>
+        <div class="featured-grid">
+          {featuredContent.map((post) => {
+            const isProject = 'difficulty' in post.data;
+            return (
+              <ArticleCard
+                title={post.data.title}
+                description={post.data.description}
+                pubDate={post.data.pubDate}
+                heroImage={post.data.heroImage}
+                category={post.data.category}
+                tags={post.data.tags}
+                href={isProject ? `/projects/${post.id}` : `/articles/${post.id}`}
+                type={isProject ? 'project' : 'article'}
+                difficulty={isProject ? post.data.difficulty : undefined}
+                estimatedIncome={isProject ? post.data.estimatedIncome : undefined}
+              />
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  )}
+  
+  <!-- Latest Articles Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>📝 最新长文</h2>
+        <a href="/articles" class="view-all">查看全部 →</a>
+      </div>
+      <div class="articles-grid">
+        {latestArticles.map((article) => (
+          <ArticleCard
+            title={article.data.title}
+            description={article.data.description}
+            pubDate={article.data.pubDate}
+            heroImage={article.data.heroImage}
+            category={article.data.category}
+            tags={article.data.tags}
+            href={`/articles/${article.id}`}
+            type="article"
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+  
+  <!-- Latest Projects Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>🔍 最新项目拆解</h2>
+        <a href="/projects" class="view-all">查看全部 →</a>
+      </div>
+      <div class="articles-grid">
+        {latestProjects.map((project) => (
+          <ArticleCard
+            title={project.data.title}
+            description={project.data.description}
+            pubDate={project.data.pubDate}
+            heroImage={project.data.heroImage}
+            category={project.data.category}
+            tags={project.data.tags}
+            href={`/projects/${project.id}`}
+            type="project"
+            difficulty={project.data.difficulty}
+            estimatedIncome={project.data.estimatedIncome}
+          />
+        ))}
+      </div>
+    </div>
+  </section>
+  
+  <!-- Categories Section -->
+  <section class="section categories-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>📂 内容分类</h2>
+        <p>找到你感兴趣的领域</p>
+      </div>
+      
+      <div class="categories-wrapper">
+        <div class="category-group">
+          <h3>深度长文</h3>
+          <div class="category-list">
+            {ARTICLE_CATEGORIES.map(cat => (
+              <a href={`/articles?category=${cat.slug}`} class="category-card">
+                <span class="category-name">{cat.name}</span>
+                <span class="category-desc">{cat.description}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+        
+        <div class="category-group">
+          <h3>项目拆解</h3>
+          <div class="category-list">
+            {PROJECT_CATEGORIES.map(cat => (
+              <a href={`/projects?category=${cat.slug}`} class="category-card">
+                <span class="category-name">{cat.name}</span>
+                <span class="category-desc">{cat.description}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- CTA Section -->
+  <section class="section cta-section">
+    <div class="container">
+      <div class="cta-card">
+        <div class="cta-content">
+          <h2>📱 关注公众号，获取更多干货</h2>
+          <p>在微信搜索「老刘说钱」或扫描二维码关注</p>
+          <p class="cta-benefits">
+            ✅ 第一时间获取新文章 · ✅ 独家内容分享 · ✅ 答疑互动
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero Section */
+  .hero {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+    color: var(--text-inverse);
+    padding: 5rem 0 6rem;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+  
+  .hero-content {
+    position: relative;
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .hero-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+  }
+  
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+  }
+  
+  .hero-title .highlight {
+    background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .hero-description {
+    font-size: 1.25rem;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+  }
+  
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 3rem;
+  }
+  
+  .hero-actions .btn-outline {
+    border-color: rgba(255, 255, 255, 0.5);
+    color: var(--text-inverse);
+  }
+  
+  .hero-actions .btn-outline:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--text-inverse);
+  }
+  
+  .hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+  }
+  
+  .stat {
+    text-align: center;
+  }
+  
+  .stat-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  
+  .stat-label {
+    font-size: 0.875rem;
+    opacity: 0.8;
+  }
+  
+  /* Sections */
+  .section {
+    padding: 4rem 0;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .section-header h2 {
+    margin: 0;
+    font-size: 1.75rem;
+  }
+  
+  .section-header p {
+    margin: 0;
+    color: var(--text-muted);
+    width: 100%;
+  }
+  
+  .view-all {
+    color: var(--primary);
+    font-weight: 500;
+    transition: color var(--transition);
+  }
+  
+  .view-all:hover {
+    color: var(--accent);
+  }
+  
+  /* Featured Grid */
+  .featured-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .featured-section {
+    background: var(--bg-tertiary);
+  }
+  
+  /* Articles Grid */
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  
+  /* Categories */
+  .categories-wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+  }
+  
+  .category-group h3 {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+  }
+  
+  .category-list {
+    display: grid;
+    gap: 0.75rem;
+  }
+  
+  .category-card {
+    display: block;
+    padding: 1rem 1.25rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: all var(--transition);
+  }
+  
+  .category-card:hover {
+    border-color: var(--primary);
+    transform: translateX(4px);
+  }
+  
+  .category-name {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+  }
+  
+  .category-desc {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+  
+  /* CTA Section */
+  .cta-section {
+    padding: 3rem 0 4rem;
+  }
+  
+  .cta-card {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: var(--text-inverse);
+    border-radius: var(--radius-xl);
+    padding: 3rem;
+    text-align: center;
+  }
+  
+  .cta-content h2 {
+    margin-bottom: 1rem;
+    color: var(--text-inverse);
+  }
+  
+  .cta-content p {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 0.5rem;
+  }
+  
+  .cta-benefits {
+    font-size: 0.875rem;
+    opacity: 0.8;
+  }
+  
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .featured-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .articles-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .hero {
+      padding: 3rem 0 4rem;
+    }
+    
+    .hero-title {
+      font-size: 2.25rem;
+    }
+    
+    .hero-description {
+      font-size: 1rem;
+    }
+    
+    .hero-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .hero-stats {
+      gap: 1.5rem;
+    }
+    
+    .stat-number {
+      font-size: 1.75rem;
+    }
+    
+    .section {
+      padding: 3rem 0;
+    }
+    
+    .articles-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .categories-wrapper {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    
+    .cta-card {
+      padding: 2rem;
+    }
+  }
+</style>

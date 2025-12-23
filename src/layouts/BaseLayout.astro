@@ -1,0 +1,32 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  class?: string;
+}
+
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Analytics from '../components/Analytics.astro';
+import '../styles/global.css';
+
+const { title, description, image, class: className } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <BaseHead title={title} description={description} image={image} />
+    <Analytics />
+  </head>
+  <body>
+    <Header />
+    <main class={className}>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
