@@ -1,12 +1,11 @@
 ---
-title: '项目拆解：闲鱼无货源实战'
-description: '零成本起步的闲鱼无货源项目，月入3000-8000的实战经验分享'
-pubDate: 2024-12-21
-category: 'side-hustle'
+title: '2026年副业推荐：闲鱼无货源怎么做？新手一天赚50的实操教程（附选品技巧）'
+description: '零成本起步的闲鱼无货源项目完整教程，从账号准备到选品发货全流程讲解，月入3000-8000的真实操作经验'
+date: 2024-12-21
+subCategory: '电商'
 tags: ['闲鱼', '无货源', '电商']
-difficulty: 'beginner'
-estimatedIncome: '3000-8000元/月'
-featured: true
+pinned: true
+draft: false
 ---
 
 ## 项目概述

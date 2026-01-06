@@ -4,6 +4,10 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "cms": "npx decap-server",
+    "auto-commit": "node scripts/auto-commit.mjs",
+    "dev:cms": "npx concurrently \"npm run dev\" \"npm run cms\"",
+    "dev:auto": "npx concurrently \"npm run dev\" \"npm run cms\" \"npm run auto-commit\"",
     "build": "astro build && npx pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro"
@@ -15,5 +19,9 @@
     "@pagefind/default-ui": "^1.4.0",
     "astro": "^5.16.6",
     "sharp": "^0.34.3"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "decap-server": "^3.1.5"
   }
 }

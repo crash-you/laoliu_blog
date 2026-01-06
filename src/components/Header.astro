@@ -1,237 +1,266 @@
 ---
-import { SITE_TITLE, NAV_LINKS } from '../consts';
+import Search from "./Search.astro";
+import ThemeToggle from "./ThemeToggle.astro";
+
+const navLinks = [
+  { href: "/", label: "首页" },
+  { href: "/articles", label: "深度长文" },
+  { href: "/projects", label: "搞钱SOP库" },
+  { href: "/stories", label: "学员故事" },
+];
 ---
 
-<header class="site-header">
-  <div class="container">
-    <nav class="nav">
-      <!-- Logo -->
-      <a href="/" class="logo">
-        <span class="logo-icon">💰</span>
-        <span class="logo-text">{SITE_TITLE}</span>
-      </a>
-      
-      <!-- Desktop Navigation -->
-      <div class="nav-links">
-        {NAV_LINKS.map(link => (
+<header class="header">
+  <div class="header-container container">
+    <a href="/" class="logo">
+      <span class="logo-icon">刘</span>
+      <span class="logo-text">老刘的生财之道</span>
+    </a>
+
+    <nav class="nav-desktop">
+      {
+        navLinks.map((link) => (
           <a href={link.href} class="nav-link">
-            {link.text}
+            {link.label}
           </a>
-        ))}
-      </div>
-      
-      <!-- Search Button -->
-      <div class="nav-actions">
-        <a href="/search" class="search-btn" title="搜索">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="m21 21-4.3-4.3"></path>
-          </svg>
-        </a>
-        
-        <!-- Mobile Menu Button -->
-        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="菜单">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
-      </div>
+        ))
+      }
     </nav>
+
+    <div class="header-actions">
+      <Search />
+      <ThemeToggle />
+      <button class="menu-toggle" aria-label="打开菜单" id="menuToggle">
+        <span class="menu-icon"></span>
+      </button>
+    </div>
   </div>
-  
+
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobileMenu">
-    <div class="mobile-menu-content">
-      {NAV_LINKS.map(link => (
-        <a href={link.href} class="mobile-nav-link">
-          {link.text}
-        </a>
-      ))}
-      <a href="/search" class="mobile-nav-link">
-        🔍 搜索
-      </a>
-    </div>
+    <nav class="mobile-nav">
+      {
+        navLinks.map((link) => (
+          <a href={link.href} class="mobile-nav-link">
+            {link.label}
+          </a>
+        ))
+      }
+    </nav>
   </div>
 </header>
 
 <style>
-  .site-header {
+  .header {
     position: sticky;
     top: 0;
     z-index: 100;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(var(--bg-primary-rgb, 10, 10, 10), 0.95);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
   }
-  
-  .nav {
+
+  :global([data-theme="light"]) .header {
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .header-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
     height: var(--header-height);
-    gap: 2rem;
   }
-  
-  /* Logo */
+
   .logo {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
+    gap: var(--spacing-sm);
     font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--primary);
-    transition: color var(--transition);
+    font-size: var(--text-lg);
+    transition: opacity var(--transition-fast);
   }
-  
+
   .logo:hover {
-    color: var(--accent);
+    opacity: 0.8;
   }
-  
+
   .logo-icon {
-    font-size: 1.5rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+      135deg,
+      var(--accent) 0%,
+      var(--accent-secondary) 100%
+    );
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 700;
+    color: white;
   }
-  
+
   .logo-text {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--accent) 0%,
+      var(--accent-secondary) 100%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
-  /* Navigation Links */
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .nav-link {
-    padding: 0.5rem 1rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    text-decoration: none;
-    border-radius: var(--radius);
-    transition: all var(--transition);
-  }
-  
-  .nav-link:hover {
-    color: var(--primary);
-    background: var(--bg-tertiary);
-  }
-  
-  .nav-link.active {
-    color: var(--primary);
-    background: var(--bg-tertiary);
-  }
-  
-  /* Nav Actions */
-  .nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .search-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    color: var(--text-secondary);
-    border-radius: var(--radius);
-    transition: all var(--transition);
-  }
-  
-  .search-btn:hover {
-    color: var(--primary);
-    background: var(--bg-tertiary);
-  }
-  
-  /* Mobile Menu Button */
-  .mobile-menu-btn {
+
+  .nav-desktop {
     display: none;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    border-radius: var(--radius);
-    transition: all var(--transition);
+    gap: var(--spacing-lg);
   }
-  
-  .mobile-menu-btn:hover {
-    color: var(--primary);
-    background: var(--bg-tertiary);
-  }
-  
-  /* Mobile Menu */
-  .mobile-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: var(--shadow-lg);
-  }
-  
-  .mobile-menu.active {
-    display: block;
-  }
-  
-  .mobile-menu-content {
-    padding: 1rem;
+
+  .header-actions {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    align-items: center;
+    gap: var(--spacing-sm);
   }
-  
-  .mobile-nav-link {
-    padding: 0.75rem 1rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    text-decoration: none;
-    border-radius: var(--radius);
-    transition: all var(--transition);
-  }
-  
-  .mobile-nav-link:hover {
-    color: var(--primary);
-    background: var(--bg-tertiary);
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .nav-links {
-      display: none;
-    }
-    
-    .mobile-menu-btn {
+
+  @media (min-width: 768px) {
+    .nav-desktop {
       display: flex;
     }
+
+    .menu-toggle {
+      display: none;
+    }
+  }
+
+  .nav-link {
+    position: relative;
+    padding: var(--spacing-sm) 0;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: color var(--transition-fast);
+  }
+
+  .nav-link:hover {
+    color: var(--text-primary);
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width var(--transition-normal);
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  .menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--text-primary);
+  }
+
+  .menu-icon {
+    position: relative;
+    width: 20px;
+    height: 2px;
+    background: currentColor;
+    transition: all var(--transition-fast);
+  }
+
+  .menu-icon::before,
+  .menu-icon::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    transition: all var(--transition-fast);
+  }
+
+  .menu-icon::before {
+    top: -6px;
+  }
+  .menu-icon::after {
+    bottom: -6px;
+  }
+
+  .menu-toggle.active .menu-icon {
+    background: transparent;
+  }
+
+  .menu-toggle.active .menu-icon::before {
+    top: 0;
+    transform: rotate(45deg);
+  }
+
+  .menu-toggle.active .menu-icon::after {
+    bottom: 0;
+    transform: rotate(-45deg);
+  }
+
+  .mobile-menu {
+    position: fixed;
+    top: var(--header-height);
+    right: 0;
+    width: 280px;
+    max-width: 80vw;
+    height: calc(100vh - var(--header-height));
+    background: var(--bg-primary);
+    padding: var(--spacing-xl);
+    transform: translateX(100%);
+    transition: transform var(--transition-normal);
+    z-index: 99;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+  }
+
+  .mobile-menu.active {
+    transform: translateX(0);
+  }
+
+  .mobile-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .mobile-nav-link {
+    display: inline-block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--text-lg);
+    font-weight: 500;
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+  }
+
+  .mobile-nav-link:hover {
+    background: var(--bg-card);
+    color: var(--text-primary);
   }
 </style>
 
 <script>
-  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-  const mobileMenu = document.getElementById('mobileMenu');
-  
-  mobileMenuBtn?.addEventListener('click', () => {
-    mobileMenu?.classList.toggle('active');
-  });
-  
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!mobileMenuBtn?.contains(e.target as Node) && !mobileMenu?.contains(e.target as Node)) {
-      mobileMenu?.classList.remove('active');
-    }
+  const menuToggle = document.getElementById("menuToggle");
+  const mobileMenu = document.getElementById("mobileMenu");
+
+  menuToggle?.addEventListener("click", () => {
+    menuToggle.classList.toggle("active");
+    mobileMenu?.classList.toggle("active");
+    document.body.style.overflow = mobileMenu?.classList.contains("active")
+      ? "hidden"
+      : "";
   });
 </script>

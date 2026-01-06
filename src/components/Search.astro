@@ -1,0 +1,300 @@
+---
+import { getCollection } from 'astro:content';
+
+// 获取所有内容用于搜索索引
+const articles = await getCollection('articles', ({ data }) => !data.draft);
+const projects = await getCollection('projects', ({ data }) => !data.draft);
+const stories = await getCollection('stories', ({ data }) => !data.draft);
+
+const searchData = [
+  ...articles.map(a => ({
+    title: a.data.title,
+    description: a.data.description || '',
+    url: `/articles/${a.slug}`,
+    category: '深度长文',
+    tags: [...(a.data.tags || []), ...(a.data.customTags || [])],
+  })),
+  ...projects.map(p => ({
+    title: p.data.title,
+    description: p.data.description || '',
+    url: `/projects/${p.slug}`,
+    category: '项目拆解',
+    tags: [...(p.data.tags || []), ...(p.data.customTags || [])],
+  })),
+  ...stories.map(s => ({
+    title: s.data.title,
+    description: s.data.description || '',
+    url: `/stories/${s.slug}`,
+    category: '学员故事',
+    tags: [...(s.data.tags || []), ...(s.data.customTags || [])],
+  })),
+];
+---
+
+<div class="search-container">
+  <button class="search-trigger" id="searchTrigger" aria-label="搜索">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="8"/>
+      <path d="M21 21l-4.35-4.35"/>
+    </svg>
+    <span class="search-text">搜索...</span>
+    <kbd class="search-kbd">Ctrl+K</kbd>
+  </button>
+</div>
+
+<!-- Search Modal -->
+<div class="search-modal" id="searchModal">
+  <div class="search-backdrop" id="searchBackdrop"></div>
+  <div class="search-dialog">
+    <div class="search-header">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input 
+        type="text" 
+        class="search-input" 
+        id="searchInput" 
+        placeholder="搜索文章、项目、故事..."
+        autocomplete="off"
+      />
+      <button class="search-close" id="searchClose">
+        <kbd>ESC</kbd>
+      </button>
+    </div>
+    <div class="search-results" id="searchResults">
+      <div class="search-empty">输入关键词开始搜索</div>
+    </div>
+  </div>
+</div>
+
+<script define:vars={{ searchData }}>
+  const modal = document.getElementById('searchModal');
+  const trigger = document.getElementById('searchTrigger');
+  const backdrop = document.getElementById('searchBackdrop');
+  const closeBtn = document.getElementById('searchClose');
+  const input = document.getElementById('searchInput');
+  const results = document.getElementById('searchResults');
+  
+  function openSearch() {
+    modal.classList.add('active');
+    input.focus();
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeSearch() {
+    modal.classList.remove('active');
+    input.value = '';
+    results.innerHTML = '<div class="search-empty">输入关键词开始搜索</div>';
+    document.body.style.overflow = '';
+  }
+  
+  function search(query) {
+    if (!query.trim()) {
+      results.innerHTML = '<div class="search-empty">输入关键词开始搜索</div>';
+      return;
+    }
+    
+    const q = query.toLowerCase();
+    const matches = searchData.filter(item => 
+      item.title.toLowerCase().includes(q) ||
+      item.description.toLowerCase().includes(q) ||
+      item.tags.some(tag => tag.toLowerCase().includes(q))
+    );
+    
+    if (matches.length === 0) {
+      results.innerHTML = '<div class="search-empty">未找到相关内容</div>';
+      return;
+    }
+    
+    results.innerHTML = matches.map(item => `
+      <a href="${item.url}" class="search-result-item">
+        <span class="result-category">${item.category}</span>
+        <span class="result-title">${item.title}</span>
+        <span class="result-desc">${item.description.slice(0, 60)}${item.description.length > 60 ? '...' : ''}</span>
+      </a>
+    `).join('');
+  }
+  
+  // Event listeners
+  trigger?.addEventListener('click', openSearch);
+  backdrop?.addEventListener('click', closeSearch);
+  closeBtn?.addEventListener('click', closeSearch);
+  input?.addEventListener('input', (e) => search(e.target.value));
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      openSearch();
+    }
+    if (e.key === 'Escape' && modal.classList.contains('active')) {
+      closeSearch();
+    }
+  });
+</script>
+
+<style>
+  .search-container {
+    position: relative;
+  }
+  
+  .search-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  
+  .search-trigger:hover {
+    background: var(--bg-card);
+    border-color: var(--accent);
+    color: var(--text-secondary);
+  }
+  
+  .search-text {
+    display: none;
+  }
+  
+  .search-kbd {
+    display: none;
+    padding: 2px 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: inherit;
+  }
+  
+  @media (min-width: 768px) {
+    .search-text, .search-kbd {
+      display: block;
+    }
+  }
+  
+  /* Modal */
+  .search-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 15vh;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+  }
+  
+  .search-modal.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .search-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+  }
+  
+  .search-dialog {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    max-height: 60vh;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transform: scale(0.95) translateY(-20px);
+    transition: transform 0.2s ease;
+  }
+  
+  .search-modal.active .search-dialog {
+    transform: scale(1) translateY(0);
+  }
+  
+  .search-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .search-header svg {
+    flex-shrink: 0;
+    color: var(--text-muted);
+  }
+  
+  .search-input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    outline: none;
+  }
+  
+  .search-input::placeholder {
+    color: var(--text-muted);
+  }
+  
+  .search-close {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+  
+  .search-results {
+    max-height: calc(60vh - 60px);
+    overflow-y: auto;
+    padding: var(--spacing-sm);
+  }
+  
+  .search-empty {
+    padding: var(--spacing-xl);
+    text-align: center;
+    color: var(--text-muted);
+  }
+  
+  .search-result-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+  }
+  
+  .search-result-item:hover {
+    background: var(--bg-secondary);
+  }
+  
+  .result-category {
+    font-size: var(--text-xs);
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .result-title {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .result-desc {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+  }
+</style>

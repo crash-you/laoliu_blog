@@ -1,334 +1,102 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ArticleCard from '../../components/ArticleCard.astro';
+import PostCard from '../../components/PostCard.astro';
+import Sidebar from '../../components/Sidebar.astro';
 import { getCollection } from 'astro:content';
-import { STORY_CATEGORIES } from '../../consts';
 
-// 获取所有故事
+// 从 Content Collections 获取所有故事
 const allStories = await getCollection('stories', ({ data }) => !data.draft);
 
-// 排序：最新的在前
-const sortedStories = allStories.sort((a, b) => 
-  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
-
-// 获取所有标签
-const allTags = [...new Set(allStories.flatMap(story => story.data.tags))];
+// 按日期排序，置顶优先
+const sortedStories = allStories.sort((a, b) => {
+  if (a.data.pinned && !b.data.pinned) return -1;
+  if (!a.data.pinned && b.data.pinned) return 1;
+  return b.data.date.getTime() - a.data.date.getTime();
+});
 ---
 
-<BaseLayout 
-  title="学员故事 - 老刘的生财之道" 
-  description="真实的学员成功案例、成长历程和踩坑经验分享"
->
-  <section class="page-header stories-header">
-    <div class="container">
-      <h1>📖 学员故事</h1>
-      <p>真实的成功案例，看看他们是怎么做到的</p>
+<BaseLayout title="学员故事 - 老刘的生财之道">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">学员故事</h1>
+      <p class="page-desc">真实学员案例分享，见证成长与蜕变</p>
     </div>
-  </section>
-  
-  <section class="page-content">
-    <div class="container">
-      <div class="content-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-          <!-- Categories -->
-          <div class="sidebar-section">
-            <h3>📂 故事分类</h3>
-            <ul class="category-list">
-              <li>
-                <a href="/stories" class="category-link active">
-                  全部故事
-                  <span class="count">{sortedStories.length}</span>
-                </a>
-              </li>
-              {STORY_CATEGORIES.map(cat => {
-                const count = allStories.filter(s => s.data.category === cat.slug).length;
-                return (
-                  <li>
-                    <a href={`/stories?category=${cat.slug}`} class="category-link">
-                      {cat.name}
-                      <span class="count">{count}</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          
-          <!-- Tags -->
-          {allTags.length > 0 && (
-            <div class="sidebar-section">
-              <h3>🏷️ 热门标签</h3>
-              <div class="tag-cloud">
-                {allTags.slice(0, 15).map(tag => (
-                  <a href={`/stories?tag=${tag}`} class="tag">{tag}</a>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          <!-- CTA -->
-          <div class="sidebar-section cta-section">
-            <h3>✍️ 投稿你的故事</h3>
-            <p>有成功经验想分享？</p>
-            <p>联系老刘，你的故事也能上墙！</p>
-          </div>
-        </aside>
+    
+    <div class="main-layout">
+      <div class="content-area">
+        <div class="posts-grid">
+          {sortedStories.map(story => (
+            <PostCard 
+              title={story.data.title}
+              slug={story.slug}
+              description={story.data.description}
+              category="story"
+              date={story.data.date}
+              pinned={story.data.pinned}
+              cover={story.data.cover}
+              tags={story.data.tags}
+            />
+          ))}
+        </div>
         
-        <!-- Main Content -->
-        <main class="main-content">
-          {sortedStories.length === 0 ? (
-            <div class="empty-state">
-              <p>📭 暂无故事</p>
-              <p class="text-muted">精彩故事即将上线...</p>
-            </div>
-          ) : (
-            <div class="stories-grid">
-              {sortedStories.map((story) => (
-                <article class="story-card">
-                  <a href={`/stories/${story.id}`} class="story-link">
-                    <div class="story-body">
-                      <div class="story-meta">
-                        <span class="category">{STORY_CATEGORIES.find(c => c.slug === story.data.category)?.name || story.data.category}</span>
-                        {story.data.income && (
-                          <span class="income">💰 {story.data.income}</span>
-                        )}
-                      </div>
-                      <h3 class="story-title">{story.data.title}</h3>
-                      <p class="story-description">{story.data.description}</p>
-                      <div class="story-footer">
-                        {story.data.author && (
-                          <span class="author">👤 {story.data.author}</span>
-                        )}
-                        {story.data.duration && (
-                          <span class="duration">⏱️ {story.data.duration}</span>
-                        )}
-                      </div>
-                    </div>
-                  </a>
-                </article>
-              ))}
-            </div>
-          )}
-        </main>
+        {sortedStories.length === 0 && (
+          <div class="empty-state">
+            <p>暂无故事，去 <a href="/admin">后台</a> 添加内容吧！</p>
+          </div>
+        )}
       </div>
+      
+      <Sidebar />
     </div>
-  </section>
+  </div>
 </BaseLayout>
 
 <style>
-  .stories-header {
-    background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
-    color: white;
-    padding: 3rem 0;
-    text-align: center;
+  .page-header {
+    padding: var(--spacing-xl) 0;
+    margin-bottom: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
   }
   
-  .stories-header h1 {
-    margin: 0 0 0.5rem 0;
-    color: white;
+  .page-title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--spacing-sm);
   }
   
-  .stories-header p {
-    margin: 0;
-    opacity: 0.9;
-  }
-  
-  .page-content {
-    padding: 3rem 0;
-  }
-  
-  .content-layout {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 3rem;
-  }
-  
-  /* Sidebar */
-  .sidebar {
-    position: sticky;
-    top: calc(var(--header-height) + 2rem);
-    align-self: start;
-  }
-  
-  .sidebar-section {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .sidebar-section h3 {
-    font-size: 1rem;
-    margin: 0 0 1rem 0;
-  }
-  
-  .category-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .category-list li {
-    margin-bottom: 0.25rem;
-  }
-  
-  .category-link {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
+  .page-desc {
     color: var(--text-secondary);
-    text-decoration: none;
-    border-radius: var(--radius);
-    transition: all var(--transition);
+    font-size: var(--text-base);
   }
   
-  .category-link:hover,
-  .category-link.active {
-    background: var(--bg-tertiary);
-    color: var(--primary);
+  .content-area {
+    min-width: 0;
   }
   
-  .category-link .count {
-    font-size: 0.75rem;
-    background: var(--bg-tertiary);
-    padding: 0.125rem 0.5rem;
-    border-radius: var(--radius-full);
-    color: var(--text-muted);
-  }
-  
-  .tag-cloud {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-  
-  .cta-section {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    color: white;
-  }
-  
-  .cta-section h3 {
-    color: white;
-  }
-  
-  .cta-section p {
-    color: rgba(255,255,255,0.9);
-    margin: 0.5rem 0;
-    font-size: 0.875rem;
-  }
-  
-  /* Story Cards */
-  .stories-grid {
+  .posts-grid {
     display: grid;
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
   }
   
-  .story-card {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    transition: all var(--transition);
+  @media (min-width: 640px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
   
-  .story-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-  }
-  
-  .story-link {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-  }
-  
-  .story-body {
-    padding: 1.5rem;
-  }
-  
-  .story-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-  }
-  
-  .story-meta .category {
-    padding: 0.25rem 0.5rem;
-    background: #38a169;
-    color: white;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-  
-  .story-meta .income {
-    padding: 0.25rem 0.5rem;
-    background: var(--accent);
-    color: var(--primary-dark);
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-  
-  .story-title {
-    font-size: 1.25rem;
-    margin: 0 0 0.5rem 0;
-    color: var(--text-primary);
-  }
-  
-  .story-card:hover .story-title {
-    color: #38a169;
-  }
-  
-  .story-description {
-    font-size: 0.938rem;
-    color: var(--text-secondary);
-    margin: 0 0 1rem 0;
-  }
-  
-  .story-footer {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.813rem;
-    color: var(--text-muted);
+  @media (min-width: 1024px) {
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
   }
   
   .empty-state {
     text-align: center;
-    padding: 4rem 2rem;
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    color: var(--text-muted);
   }
   
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .content-layout {
-      grid-template-columns: 1fr;
-    }
-    
-    .sidebar {
-      position: static;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-    }
-    
-    .sidebar-section {
-      margin-bottom: 0;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .stories-header {
-      padding: 2rem 0;
-    }
-    
-    .sidebar {
-      grid-template-columns: 1fr;
-    }
+  .empty-state a {
+    color: var(--accent);
   }
 </style>

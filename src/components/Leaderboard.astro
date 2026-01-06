@@ -1,0 +1,235 @@
+---
+interface RankItem {
+  title: string;
+  link: string;
+  author?: string;
+  likes?: number;
+  views?: number;
+}
+
+interface Props {
+  title?: string;
+  icon?: string;
+  items?: RankItem[];
+  type?: 'content' | 'author';
+}
+
+const defaultItems: RankItem[] = [
+  { title: "用AI做公众号，3个月变现5万+", link: "/articles/ai-wechat", author: "老刘", likes: 89, views: 1280 },
+  { title: "小红书从0到1万粉丝全攻略", link: "/projects/xiaohongshu", author: "老刘", likes: 67, views: 856 },
+  { title: "副业变现的底层逻辑解析", link: "/articles/monetization", author: "老刘", likes: 52, views: 723 },
+  { title: "公众号起号避坑指南", link: "/articles/wechat-tips", author: "老刘", likes: 48, views: 612 },
+  { title: "2024年AI副业最强玩法", link: "/articles/ai-2024", author: "老刘", likes: 41, views: 543 },
+];
+
+const { 
+  title = "内容点赞榜", 
+  icon = "👍",
+  items = defaultItems,
+  type = 'content'
+} = Astro.props;
+---
+
+<div class="leaderboard">
+  <div class="leaderboard-header">
+    <div class="header-title">
+      <span class="header-icon">{icon}</span>
+      <span>{title}</span>
+    </div>
+    <div class="header-tabs">
+      <button class="period-tab active">近7天</button>
+      <button class="period-tab">近1月</button>
+      <button class="period-tab">近1年</button>
+    </div>
+  </div>
+  
+  <ul class="leaderboard-list">
+    {items.slice(0, 5).map((item, index) => (
+      <li class="leaderboard-item">
+        <span class={`item-rank rank-${index + 1}`}>{index + 1}</span>
+        <div class="item-content">
+          <a href={item.link} class="item-title">{item.title}</a>
+          <div class="item-meta">
+            {item.author && <span class="item-author">{item.author}</span>}
+            {item.likes && (
+              <span class="item-stat">
+                <span>❤️</span>
+                <span>{item.likes}</span>
+              </span>
+            )}
+          </div>
+        </div>
+      </li>
+    ))}
+  </ul>
+  
+  <a href="#" class="leaderboard-more">
+    查看更多 →
+  </a>
+</div>
+
+<style>
+  .leaderboard {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  
+  .leaderboard-header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-weight: 600;
+    font-size: var(--text-base);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .header-icon {
+    font-size: 1rem;
+  }
+  
+  .header-tabs {
+    display: flex;
+    gap: var(--spacing-xs);
+  }
+  
+  .period-tab {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    background: transparent;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-fast);
+  }
+  
+  .period-tab:hover {
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+  }
+  
+  .period-tab.active {
+    color: var(--accent);
+    background: rgba(255, 107, 53, 0.15);
+  }
+  
+  .leaderboard-list {
+    padding: var(--spacing-sm);
+  }
+  
+  .leaderboard-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    transition: background var(--transition-fast);
+  }
+  
+  .leaderboard-item:hover {
+    background: var(--bg-secondary);
+  }
+  
+  .item-rank {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+  }
+  
+  .item-rank.rank-1 {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8555 100%);
+    color: white;
+  }
+  
+  .item-rank.rank-2 {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4a 100%);
+    color: #1a1a1a;
+  }
+  
+  .item-rank.rank-3 {
+    background: linear-gradient(135deg, #cd7f32 0%, #daa06d 100%);
+    color: white;
+  }
+  
+  .item-content {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .item-title {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color var(--transition-fast);
+  }
+  
+  .item-title:hover {
+    color: var(--accent);
+  }
+  
+  .item-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: 2px;
+  }
+  
+  .item-author {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+  
+  .item-stat {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+  }
+  
+  .item-stat span:first-child {
+    font-size: 10px;
+  }
+  
+  .leaderboard-more {
+    display: block;
+    padding: var(--spacing-sm) var(--spacing-md);
+    text-align: center;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+    transition: all var(--transition-fast);
+  }
+  
+  .leaderboard-more:hover {
+    background: var(--bg-secondary);
+    color: var(--accent);
+  }
+</style>
+
+<script>
+  document.querySelectorAll('.period-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const parent = tab.closest('.leaderboard-header');
+      parent?.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+</script>

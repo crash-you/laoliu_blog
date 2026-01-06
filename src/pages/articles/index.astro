@@ -1,246 +1,192 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ArticleCard from '../../components/ArticleCard.astro';
+import PostCard from '../../components/PostCard.astro';
+import Sidebar from '../../components/Sidebar.astro';
 import { getCollection } from 'astro:content';
-import { ARTICLE_CATEGORIES } from '../../consts';
 
-// 获取所有文章
+// 从 Content Collections 获取所有文章
 const allArticles = await getCollection('articles', ({ data }) => !data.draft);
 
-// 排序：最新的在前
-const sortedArticles = allArticles.sort((a, b) => 
-  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+// 按日期排序，置顶优先
+const sortedArticles = allArticles.sort((a, b) => {
+  if (a.data.pinned && !b.data.pinned) return -1;
+  if (!a.data.pinned && b.data.pinned) return 1;
+  return b.data.date.getTime() - a.data.date.getTime();
+});
 
-// 获取所有标签
-const allTags = [...new Set(allArticles.flatMap(article => article.data.tags))];
+// 获取实际分类（优先使用自定义分类）
+const getActualCategory = (article: typeof allArticles[0]) => {
+  return article.data.customSubCategory || article.data.subCategory;
+};
+
+// 动态获取所有子分类（包括自定义分类）
+const allSubCategories = [...new Set(allArticles.map(a => getActualCategory(a)))];
+const subCategories = ['全部', ...allSubCategories];
 ---
 
-<BaseLayout 
-  title="深度长文 - 老刘的生财之道" 
-  description="老刘的深度思考和经验分享，关于互联网思维、变现方法论、个人成长等"
->
-  <section class="page-header">
-    <div class="container">
-      <h1>📝 深度长文</h1>
-      <p>老刘的深度思考和经验分享</p>
+<BaseLayout title="深度长文 - 老刘的生财之道">
+  <div class="container">
+    <div class="page-header">
+      <h1 class="page-title">深度长文</h1>
+      <p class="page-desc">深度思考、方法论、底层逻辑分享</p>
     </div>
-  </section>
-  
-  <section class="page-content">
-    <div class="container">
-      <div class="content-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-          <!-- Categories -->
-          <div class="sidebar-section">
-            <h3>📂 文章分类</h3>
-            <ul class="category-list">
-              <li>
-                <a href="/articles" class="category-link active">
-                  全部文章
-                  <span class="count">{sortedArticles.length}</span>
-                </a>
-              </li>
-              {ARTICLE_CATEGORIES.map(cat => {
-                const count = allArticles.filter(a => a.data.category === cat.slug).length;
-                return (
-                  <li>
-                    <a href={`/articles?category=${cat.slug}`} class="category-link">
-                      {cat.name}
-                      <span class="count">{count}</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          
-          <!-- Tags -->
-          {allTags.length > 0 && (
-            <div class="sidebar-section">
-              <h3>🏷️ 热门标签</h3>
-              <div class="tag-cloud">
-                {allTags.slice(0, 15).map(tag => (
-                  <a href={`/articles?tag=${tag}`} class="tag">{tag}</a>
-                ))}
-              </div>
+    
+    <!-- 动态生成的子分类导航 -->
+    <div class="sub-categories" id="subCategories">
+      {subCategories.map((cat, index) => (
+        <button 
+          class={`sub-cat-btn ${index === 0 ? 'active' : ''}`}
+          data-sub-category={cat}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+    
+    <div class="main-layout">
+      <div class="content-area">
+        <div class="posts-grid">
+          {sortedArticles.map(article => (
+            <div class="post-wrapper" data-sub-category={getActualCategory(article)}>
+              <PostCard 
+                title={article.data.title}
+                slug={article.slug}
+                description={article.data.description}
+                category="article"
+                date={article.data.date}
+                pinned={article.data.pinned}
+                cover={article.data.cover}
+                tags={article.data.tags}
+              />
             </div>
-          )}
-        </aside>
+          ))}
+        </div>
         
-        <!-- Main Content -->
-        <main class="main-content">
-          {sortedArticles.length === 0 ? (
-            <div class="empty-state">
-              <p>📭 暂无文章</p>
-              <p class="text-muted">老刘正在努力创作中...</p>
-            </div>
-          ) : (
-            <div class="articles-grid">
-              {sortedArticles.map((article) => (
-                <ArticleCard
-                  title={article.data.title}
-                  description={article.data.description}
-                  pubDate={article.data.pubDate}
-                  heroImage={article.data.heroImage}
-                  category={article.data.category}
-                  tags={article.data.tags}
-                  href={`/articles/${article.id}`}
-                  type="article"
-                />
-              ))}
-            </div>
-          )}
-        </main>
+        {sortedArticles.length === 0 && (
+          <div class="empty-state">
+            <p>暂无文章，去 <a href="/admin">后台</a> 添加内容吧！</p>
+          </div>
+        )}
       </div>
+      
+      <Sidebar />
     </div>
-  </section>
+  </div>
 </BaseLayout>
 
 <style>
   .page-header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-    color: var(--text-inverse);
-    padding: 3rem 0;
-    text-align: center;
+    padding: var(--spacing-xl) 0;
+    margin-bottom: var(--spacing-md);
   }
   
-  .page-header h1 {
-    margin: 0 0 0.5rem 0;
-    color: var(--text-inverse);
+  .page-title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--spacing-sm);
   }
   
-  .page-header p {
-    margin: 0;
-    opacity: 0.9;
-  }
-  
-  .page-content {
-    padding: 3rem 0;
-  }
-  
-  .content-layout {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 3rem;
-  }
-  
-  /* Sidebar */
-  .sidebar {
-    position: sticky;
-    top: calc(var(--header-height) + 2rem);
-    align-self: start;
-  }
-  
-  .sidebar-section {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .sidebar-section h3 {
-    font-size: 1rem;
-    margin: 0 0 1rem 0;
-    color: var(--text-primary);
-  }
-  
-  .category-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .category-list li {
-    margin-bottom: 0.25rem;
-  }
-  
-  .category-link {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
+  .page-desc {
     color: var(--text-secondary);
-    text-decoration: none;
-    border-radius: var(--radius);
-    transition: all var(--transition);
+    font-size: var(--text-base);
   }
   
-  .category-link:hover,
-  .category-link.active {
-    background: var(--bg-tertiary);
-    color: var(--primary);
-  }
-  
-  .category-link .count {
-    font-size: 0.75rem;
-    background: var(--bg-tertiary);
-    padding: 0.125rem 0.5rem;
-    border-radius: var(--radius-full);
-    color: var(--text-muted);
-  }
-  
-  .category-link.active .count,
-  .category-link:hover .count {
-    background: var(--primary);
-    color: var(--text-inverse);
-  }
-  
-  .tag-cloud {
+  .sub-categories {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-xl);
   }
   
-  /* Main Content */
-  .articles-grid {
+  .sub-cat-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+  
+  .sub-cat-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+  }
+  
+  .sub-cat-btn.active {
+    color: var(--accent);
+    background: rgba(255, 107, 53, 0.15);
+    border-color: var(--accent);
+  }
+  
+  .content-area {
+    min-width: 0;
+  }
+  
+  .posts-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+  
+  @media (min-width: 640px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .post-wrapper {
+    animation: fadeIn 0.3s ease forwards;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   
   .empty-state {
     text-align: center;
-    padding: 4rem 2rem;
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    color: var(--text-muted);
   }
   
-  .empty-state p:first-child {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .content-layout {
-      grid-template-columns: 1fr;
-    }
-    
-    .sidebar {
-      position: static;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-    }
-    
-    .sidebar-section {
-      margin-bottom: 0;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .page-header {
-      padding: 2rem 0;
-    }
-    
-    .sidebar {
-      grid-template-columns: 1fr;
-    }
-    
-    .articles-grid {
-      grid-template-columns: 1fr;
-    }
+  .empty-state a {
+    color: var(--accent);
   }
 </style>
+
+<script>
+  const subCatContainer = document.getElementById('subCategories');
+  const postWrappers = document.querySelectorAll('.post-wrapper');
+  
+  subCatContainer?.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    const btn = target.closest('.sub-cat-btn') as HTMLElement;
+    if (!btn) return;
+    
+    // Update active state
+    subCatContainer.querySelectorAll('.sub-cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    
+    // Filter posts
+    const subCategory = btn.getAttribute('data-sub-category');
+    
+    postWrappers.forEach(wrapper => {
+      const wrapperCategory = wrapper.getAttribute('data-sub-category');
+      const shouldShow = subCategory === '全部' || wrapperCategory === subCategory;
+      
+      (wrapper as HTMLElement).style.display = shouldShow ? '' : 'none';
+    });
+  });
+</script>

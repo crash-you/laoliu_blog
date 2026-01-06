@@ -1,0 +1,79 @@
+---
+import { getCollection } from 'astro:content';
+import PostCard from './PostCard.astro';
+
+interface Props {
+  currentSlug: string;
+  currentTags: string[];
+  collection: 'articles' | 'projects' | 'stories';
+  limit?: number;
+}
+
+const { currentSlug, currentTags = [], collection, limit = 3 } = Astro.props;
+
+// 获取同一集合的所有文章
+const allPosts = await getCollection(collection, ({ data }) => !data.draft);
+
+// 根据标签匹配度排序
+const relatedPosts = allPosts
+  .filter(post => post.slug !== currentSlug)
+  .map(post => {
+    const postTags = [...(post.data.tags || []), ...(post.data.customTags || [])];
+    const matchCount = postTags.filter(tag => currentTags.includes(tag)).length;
+    return { post, matchCount };
+  })
+  .sort((a, b) => b.matchCount - a.matchCount || b.post.data.date.getTime() - a.post.data.date.getTime())
+  .slice(0, limit)
+  .map(item => item.post);
+
+const categoryMap = {
+  articles: 'article',
+  projects: 'project', 
+  stories: 'story',
+} as const;
+---
+
+{relatedPosts.length > 0 && (
+  <div class="related-posts">
+    <h3 class="related-title">相关推荐</h3>
+    <div class="related-grid">
+      {relatedPosts.map(post => (
+        <PostCard
+          title={post.data.title}
+          slug={post.slug}
+          description={post.data.description}
+          category={categoryMap[collection]}
+          date={post.data.date}
+          cover={post.data.cover}
+          tags={post.data.tags}
+        />
+      ))}
+    </div>
+  </div>
+)}
+
+<style>
+  .related-posts {
+    margin-top: var(--spacing-2xl);
+    padding-top: var(--spacing-xl);
+    border-top: 1px solid var(--border-color);
+  }
+  
+  .related-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .related-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  @media (min-width: 768px) {
+    .related-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

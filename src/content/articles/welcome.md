@@ -1,10 +1,11 @@
 ---
 title: '欢迎来到老刘的生财之道'
 description: '这是网站的第一篇文章，介绍老刘做这个独立站的初衷和内容规划'
-pubDate: 2024-12-23
-category: 'mindset'
+date: 2024-12-23
+subCategory: '思维干货'
 tags: ['入门', '指南']
-featured: true
+pinned: true
+draft: false
 ---
 
 ## 你好，我是老刘

@@ -1,279 +1,214 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import ArticleCard from '../../components/ArticleCard.astro';
-import { getCollection } from 'astro:content';
-import { PROJECT_CATEGORIES, DIFFICULTY_LEVELS } from '../../consts';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PostCard from "../../components/PostCard.astro";
+import Sidebar from "../../components/Sidebar.astro";
+import { getCollection } from "astro:content";
 
-// 获取所有项目
-const allProjects = await getCollection('projects', ({ data }) => !data.draft);
+// 从 Content Collections 获取所有项目
+const allProjects = await getCollection("projects", ({ data }) => !data.draft);
 
-// 排序：最新的在前
-const sortedProjects = allProjects.sort((a, b) => 
-  b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+// 按日期排序，置顶优先
+const sortedProjects = allProjects.sort((a, b) => {
+  if (a.data.pinned && !b.data.pinned) return -1;
+  if (!a.data.pinned && b.data.pinned) return 1;
+  return b.data.date.getTime() - a.data.date.getTime();
+});
 
-// 获取所有标签
-const allTags = [...new Set(allProjects.flatMap(project => project.data.tags))];
+// 获取实际分类（优先使用自定义分类）
+const getActualCategory = (project: (typeof allProjects)[0]) => {
+  return project.data.customSubCategory || project.data.subCategory;
+};
+
+// 动态获取所有子分类（包括自定义分类）
+const allSubCategories = [
+  ...new Set(allProjects.map((p) => getActualCategory(p))),
+];
+const subCategories = ["全部", ...allSubCategories];
 ---
 
-<BaseLayout 
-  title="项目拆解 - 老刘的生财之道" 
-  description="老刘拆解的各种互联网赚钱项目，包含项目分析、操作流程、收入预估等"
->
-  <section class="page-header">
-    <div class="container">
-      <h1>🔍 项目拆解</h1>
-      <p>手把手教你拆解各种赚钱项目</p>
+<BaseLayout title="搞钱SOP库 - 老刘的生财之道">
+  <main class="container">
+    <div class="page-header">
+      <h1 class="page-title">搞钱SOP库</h1>
+      <p class="page-desc">具体项目操作分析、实战案例复盘</p>
     </div>
-  </section>
-  
-  <section class="page-content">
-    <div class="container">
-      <div class="content-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-          <!-- Categories -->
-          <div class="sidebar-section">
-            <h3>📂 项目分类</h3>
-            <ul class="category-list">
-              <li>
-                <a href="/projects" class="category-link active">
-                  全部项目
-                  <span class="count">{sortedProjects.length}</span>
-                </a>
-              </li>
-              {PROJECT_CATEGORIES.map(cat => {
-                const count = allProjects.filter(p => p.data.category === cat.slug).length;
-                return (
-                  <li>
-                    <a href={`/projects?category=${cat.slug}`} class="category-link">
-                      {cat.name}
-                      <span class="count">{count}</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          
-          <!-- Difficulty Filter -->
-          <div class="sidebar-section">
-            <h3>📊 难度等级</h3>
-            <ul class="category-list">
-              {DIFFICULTY_LEVELS.map(level => {
-                const count = allProjects.filter(p => p.data.difficulty === level.slug).length;
-                return (
-                  <li>
-                    <a href={`/projects?difficulty=${level.slug}`} class="category-link">
-                      <span class="difficulty-badge" style={`--color: ${level.color}`}>
-                        {level.name}
-                      </span>
-                      <span class="count">{count}</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-          
-          <!-- Tags -->
-          {allTags.length > 0 && (
-            <div class="sidebar-section">
-              <h3>🏷️ 热门标签</h3>
-              <div class="tag-cloud">
-                {allTags.slice(0, 15).map(tag => (
-                  <a href={`/projects?tag=${tag}`} class="tag">{tag}</a>
-                ))}
-              </div>
-            </div>
-          )}
-        </aside>
-        
-        <!-- Main Content -->
-        <main class="main-content">
-          {sortedProjects.length === 0 ? (
-            <div class="empty-state">
-              <p>📭 暂无项目</p>
-              <p class="text-muted">老刘正在拆解项目中...</p>
-            </div>
-          ) : (
-            <div class="projects-grid">
-              {sortedProjects.map((project) => (
-                <ArticleCard
+
+    <!-- 动态生成的子分类导航 -->
+    <div class="sub-categories" id="subCategories">
+      {
+        subCategories.map((cat, index) => (
+          <button
+            class={`sub-cat-btn ${index === 0 ? "active" : ""}`}
+            data-sub-category={cat}
+          >
+            {cat}
+          </button>
+        ))
+      }
+    </div>
+
+    <div class="main-layout">
+      <div class="content-area">
+        <div class="posts-grid">
+          {
+            sortedProjects.map((project) => (
+              <div
+                class="post-wrapper"
+                data-sub-category={getActualCategory(project)}
+              >
+                <PostCard
                   title={project.data.title}
+                  slug={project.slug}
                   description={project.data.description}
-                  pubDate={project.data.pubDate}
-                  heroImage={project.data.heroImage}
-                  category={project.data.category}
+                  category="project"
+                  date={project.data.date}
+                  pinned={project.data.pinned}
+                  cover={project.data.cover}
                   tags={project.data.tags}
-                  href={`/projects/${project.id}`}
-                  type="project"
-                  difficulty={project.data.difficulty}
-                  estimatedIncome={project.data.estimatedIncome}
                 />
-              ))}
+              </div>
+            ))
+          }
+        </div>
+
+        {
+          sortedProjects.length === 0 && (
+            <div class="empty-state">
+              <p>
+                暂无项目，去 <a href="/admin">后台</a> 添加内容吧！
+              </p>
             </div>
-          )}
-        </main>
+          )
+        }
       </div>
+
+      <Sidebar />
     </div>
-  </section>
+  </main>
 </BaseLayout>
 
 <style>
   .page-header {
-    background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 100%);
-    color: var(--text-primary);
-    padding: 3rem 0;
-    text-align: center;
+    padding: var(--spacing-xl) 0;
+    margin-bottom: var(--spacing-md);
   }
-  
-  .page-header h1 {
-    margin: 0 0 0.5rem 0;
-    color: var(--primary-dark);
+
+  .page-title {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--spacing-sm);
   }
-  
-  .page-header p {
-    margin: 0;
-    color: var(--primary-dark);
-    opacity: 0.9;
-  }
-  
-  .page-content {
-    padding: 3rem 0;
-  }
-  
-  .content-layout {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 3rem;
-  }
-  
-  /* Sidebar */
-  .sidebar {
-    position: sticky;
-    top: calc(var(--header-height) + 2rem);
-    align-self: start;
-  }
-  
-  .sidebar-section {
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .sidebar-section h3 {
-    font-size: 1rem;
-    margin: 0 0 1rem 0;
-    color: var(--text-primary);
-  }
-  
-  .category-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .category-list li {
-    margin-bottom: 0.25rem;
-  }
-  
-  .category-link {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
+
+  .page-desc {
     color: var(--text-secondary);
-    text-decoration: none;
-    border-radius: var(--radius);
-    transition: all var(--transition);
+    font-size: var(--text-base);
   }
-  
-  .category-link:hover,
-  .category-link.active {
-    background: var(--bg-tertiary);
-    color: var(--primary);
-  }
-  
-  .category-link .count {
-    font-size: 0.75rem;
-    background: var(--bg-tertiary);
-    padding: 0.125rem 0.5rem;
-    border-radius: var(--radius-full);
-    color: var(--text-muted);
-  }
-  
-  .category-link.active .count,
-  .category-link:hover .count {
-    background: var(--primary);
-    color: var(--text-inverse);
-  }
-  
-  .difficulty-badge {
-    display: inline-block;
-    padding: 0.125rem 0.5rem;
-    background: var(--color);
-    color: white;
-    border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-  
-  .tag-cloud {
+
+  .sub-categories {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-xl);
   }
-  
-  /* Main Content */
-  .projects-grid {
+
+  .sub-cat-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .sub-cat-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+  }
+
+  .sub-cat-btn.active {
+    color: var(--accent);
+    background: rgba(255, 107, 53, 0.15);
+    border-color: var(--accent);
+  }
+
+  .content-area {
+    min-width: 0;
+  }
+
+  .posts-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
   }
-  
+
+  @media (min-width: 640px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .post-wrapper {
+    animation: fadeIn 0.3s ease forwards;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   .empty-state {
     text-align: center;
-    padding: 4rem 2rem;
-    background: var(--bg-secondary);
-    border-radius: var(--radius-lg);
+    padding: var(--spacing-2xl);
+    color: var(--text-muted);
   }
-  
-  .empty-state p:first-child {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .content-layout {
-      grid-template-columns: 1fr;
-    }
-    
-    .sidebar {
-      position: static;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-    }
-    
-    .sidebar-section {
-      margin-bottom: 0;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .page-header {
-      padding: 2rem 0;
-    }
-    
-    .sidebar {
-      grid-template-columns: 1fr;
-    }
-    
-    .projects-grid {
-      grid-template-columns: 1fr;
-    }
+
+  .empty-state a {
+    color: var(--accent);
   }
 </style>
+
+<script>
+  const subCatContainer = document.getElementById("subCategories");
+  const postWrappers = document.querySelectorAll(".post-wrapper");
+
+  subCatContainer?.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    const btn = target.closest(".sub-cat-btn") as HTMLElement;
+    if (!btn) return;
+
+    // Update active state
+    subCatContainer
+      .querySelectorAll(".sub-cat-btn")
+      .forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    // Filter posts
+    const subCategory = btn.getAttribute("data-sub-category");
+
+    postWrappers.forEach((wrapper) => {
+      const wrapperCategory = wrapper.getAttribute("data-sub-category");
+      const shouldShow =
+        subCategory === "全部" || wrapperCategory === subCategory;
+
+      (wrapper as HTMLElement).style.display = shouldShow ? "" : "none";
+    });
+  });
+</script>

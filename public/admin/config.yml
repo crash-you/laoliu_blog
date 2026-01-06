@@ -1,0 +1,138 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# 本地开发模式（不需要 Git）
+local_backend: true
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+locale: 'zh_Hans'
+
+collections:
+  # 深度长文
+  - name: "articles"
+    label: "深度长文"
+    folder: "src/content/articles"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "摘要", name: "description", widget: "text", required: false }
+      - { label: "发布日期", name: "date", widget: "datetime" }
+      - label: "子分类"
+        name: "subCategory"
+        widget: "select"
+        options:
+          - { label: "思维方法", value: "思维方法" }
+          - { label: "赚钱逻辑", value: "赚钱逻辑" }
+          - { label: "个人成长", value: "个人成长" }
+          - { label: "技能干货", value: "技能干货" }
+          - { label: "其他", value: "其他" }
+        default: "其他"
+        hint: "选择已有分类，或在下方自定义"
+      - { label: "自定义子分类", name: "customSubCategory", widget: "string", required: false, hint: "如果上面没有合适的分类，可以在这里自定义" }
+      - { label: "置顶", name: "pinned", widget: "boolean", default: false }
+      - { label: "封面图", name: "cover", widget: "image", required: false }
+      - label: "标签"
+        name: "tags"
+        widget: "select"
+        multiple: true
+        options:
+          - "AI"
+          - "公众号"
+          - "小红书"
+          - "抖音"
+          - "视频号"
+          - "电商"
+          - "变现"
+          - "涨粉"
+          - "引流"
+          - "知识付费"
+          - "副业"
+          - "方法论"
+        default: []
+        hint: "选择已有标签"
+      - { label: "自定义标签", name: "customTags", widget: "list", required: false, hint: "添加新标签（自由输入）" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - { label: "正文", name: "body", widget: "markdown" }
+
+  # 项目拆解
+  - name: "projects"
+    label: "项目拆解"
+    folder: "src/content/projects"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "摘要", name: "description", widget: "text", required: false }
+      - { label: "发布日期", name: "date", widget: "datetime" }
+      - label: "子分类"
+        name: "subCategory"
+        widget: "select"
+        options:
+          - { label: "AI项目", value: "AI项目" }
+          - { label: "公众号", value: "公众号" }
+          - { label: "小红书", value: "小红书" }
+          - { label: "抖音", value: "抖音" }
+          - { label: "视频号", value: "视频号" }
+          - { label: "电商", value: "电商" }
+          - { label: "其他", value: "其他" }
+        default: "其他"
+        hint: "选择已有分类，或在下方自定义"
+      - { label: "自定义子分类", name: "customSubCategory", widget: "string", required: false, hint: "如果上面没有合适的分类，可以在这里自定义" }
+      - { label: "置顶", name: "pinned", widget: "boolean", default: false }
+      - { label: "封面图", name: "cover", widget: "image", required: false }
+      - label: "标签"
+        name: "tags"
+        widget: "select"
+        multiple: true
+        options:
+          - "AI"
+          - "公众号"
+          - "小红书"
+          - "抖音"
+          - "视频号"
+          - "电商"
+          - "变现"
+          - "涨粉"
+          - "引流"
+          - "知识付费"
+          - "副业"
+          - "实操"
+        default: []
+        hint: "选择已有标签"
+      - { label: "自定义标签", name: "customTags", widget: "list", required: false, hint: "添加新标签（自由输入）" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - { label: "正文", name: "body", widget: "markdown" }
+
+  # 学员故事
+  - name: "stories"
+    label: "学员故事"
+    folder: "src/content/stories"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "标题", name: "title", widget: "string" }
+      - { label: "摘要", name: "description", widget: "text", required: false }
+      - { label: "发布日期", name: "date", widget: "datetime" }
+      - { label: "置顶", name: "pinned", widget: "boolean", default: false }
+      - { label: "封面图", name: "cover", widget: "image", required: false }
+      - label: "标签"
+        name: "tags"
+        widget: "select"
+        multiple: true
+        options:
+          - "成长"
+          - "蜕变"
+          - "副业"
+          - "公众号"
+          - "小红书"
+          - "抖音"
+          - "变现"
+        default: []
+        hint: "选择已有标签"
+      - { label: "自定义标签", name: "customTags", widget: "list", required: false, hint: "添加新标签（自由输入）" }
+      - { label: "草稿", name: "draft", widget: "boolean", default: false }
+      - { label: "正文", name: "body", widget: "markdown" }

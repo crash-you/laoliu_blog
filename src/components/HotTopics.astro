@@ -1,0 +1,145 @@
+---
+interface Topic {
+  id: string;
+  label: string;
+  hot?: boolean;
+}
+
+interface Props {
+  topics?: Topic[];
+}
+
+const defaultTopics: Topic[] = [
+  { id: "ai", label: "AI副业", hot: true },
+  { id: "wechat", label: "公众号" },
+  { id: "xiaohongshu", label: "小红书", hot: true },
+  { id: "douyin", label: "抖音" },
+  { id: "video", label: "视频号" },
+  { id: "knowledge", label: "知识付费" },
+  { id: "traffic", label: "流量玩法" },
+  { id: "ecommerce", label: "电商带货" },
+  { id: "freelance", label: "自由职业" },
+  { id: "growth", label: "个人成长" },
+];
+
+const { topics = defaultTopics } = Astro.props;
+---
+
+<div class="hot-topics">
+  <div class="topics-header">
+    <span class="topics-icon">🔥</span>
+    <span class="topics-title">热门话题</span>
+  </div>
+  <div class="topics-list">
+    {topics.map(topic => (
+      <a 
+        href={`/?topic=${topic.id}`}
+        class={`topic-tag ${topic.hot ? 'hot' : ''}`}
+        data-topic={topic.id}
+      >
+        {topic.hot && <span class="hot-badge">热</span>}
+        <span>{topic.label}</span>
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  .hot-topics {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .topics-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+  }
+  
+  .topics-icon {
+    font-size: 1rem;
+  }
+  
+  .topics-title {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+  }
+  
+  .topics-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+  
+  .topic-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+  }
+  
+  .topic-tag:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  
+  .topic-tag.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  
+  .topic-tag.hot {
+    background: rgba(255, 107, 53, 0.1);
+    border-color: rgba(255, 107, 53, 0.3);
+    color: var(--accent);
+  }
+  
+  .hot-badge {
+    display: inline-block;
+    padding: 1px 4px;
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 3px;
+  }
+</style>
+
+<script>
+  document.querySelectorAll('.topic-tag').forEach(tag => {
+    tag.addEventListener('click', (e) => {
+      e.preventDefault();
+      const topic = tag.getAttribute('data-topic');
+      
+      // Toggle active state
+      tag.classList.toggle('active');
+      
+      // Filter posts by topic
+      const posts = document.querySelectorAll('.post-card');
+      const activeTags = [...document.querySelectorAll('.topic-tag.active')].map(t => t.getAttribute('data-topic'));
+      
+      posts.forEach(post => {
+        const postTags = post.getAttribute('data-tags')?.split(',') || [];
+        
+        let shouldShow = activeTags.length === 0 || 
+                        activeTags.some(t => postTags.includes(t!));
+        
+        (post as HTMLElement).style.display = shouldShow ? '' : 'none';
+      });
+    });
+  });
+</script>

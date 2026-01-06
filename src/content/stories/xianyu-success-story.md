@@ -1,13 +1,10 @@
 ---
 title: '从0到月入5000的闲鱼之路'
 description: '90后宝妈小李的副业逆袭故事，3个月时间从完全不懂到稳定月入5000'
-pubDate: 2024-12-20
-category: 'success'
-author: '小李（化名）'
-income: '月入5000+'
-duration: '3个月'
+date: 2024-12-20
 tags: ['闲鱼', '宝妈副业', '新手逆袭']
-featured: true
+pinned: true
+draft: false
 ---
 
 ## 故事背景

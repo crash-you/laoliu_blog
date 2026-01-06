@@ -1,32 +1,63 @@
 ---
-interface Props {
-  title: string;
-  description: string;
-  image?: string;
-  class?: string;
-}
-
-import BaseHead from '../components/BaseHead.astro';
+import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import Analytics from '../components/Analytics.astro';
-import '../styles/global.css';
+import Popup from '../components/Popup.astro';
+import SEO from '../components/SEO.astro';
+import ReadingProgress from '../components/ReadingProgress.astro';
 
-const { title, description, image, class: className } = Astro.props;
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: Date;
+  tags?: string[];
+}
+
+const { 
+  title = "老刘的生财之道", 
+  description = "分享深度思考、项目拆解、学员故事，帮你找到属于自己的生财之道",
+  image,
+  type = 'website',
+  publishedTime,
+  tags = [],
+} = Astro.props;
 ---
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <BaseHead title={title} description={description} image={image} />
-    <Analytics />
-  </head>
-  <body>
-    <Header />
-    <main class={className}>
-      <slot />
-    </main>
-    <Footer />
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <SEO 
+    title={title}
+    description={description}
+    image={image}
+    type={type}
+    publishedTime={publishedTime}
+    tags={tags}
+  />
+  <title>{title}</title>
+  <script is:inline>
+    // Prevent flash of wrong theme
+    (function() {
+      const theme = localStorage.getItem('theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
+</head>
+<body>
+  <ReadingProgress />
+  <Header />
+  <main>
+    <slot />
+  </main>
+  <Footer />
+  <Popup />
+</body>
 </html>
-

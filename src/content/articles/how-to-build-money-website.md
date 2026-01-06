@@ -1,10 +1,11 @@
 ---
 title: '如何从0到1搭建一个赚钱的网站'
 description: '手把手教你用最低成本搭建一个可以持续变现的网站，适合完全没有技术基础的新手'
-pubDate: 2024-12-22
-category: 'monetization'
+date: 2024-12-22
+subCategory: '技能干货'
 tags: ['建站', '变现', '新手教程']
-featured: true
+pinned: true
+draft: false
 ---
 
 ## 前言

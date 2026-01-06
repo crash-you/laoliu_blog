@@ -1,9 +1,10 @@
 ---
 title: Test Auto Submit
 description: Test Description
-pubDate: 2025-12-24
-category: mindset
-featured: false
+date: 2025-12-24
+subCategory: '其他'
+tags: []
+pinned: false
 draft: false
 ---
 Test Body Content

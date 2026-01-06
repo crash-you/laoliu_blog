@@ -1,0 +1,227 @@
+---
+interface CategoryGroup {
+  title: string;
+  icon: string;
+  items: { id: string; label: string; count?: number }[];
+}
+
+interface Props {
+  activeCategory?: string;
+}
+
+const { activeCategory = 'all' } = Astro.props;
+
+const categoryGroups: CategoryGroup[] = [
+  {
+    title: "内容类型",
+    icon: "📂",
+    items: [
+      { id: "all", label: "全部内容" },
+      { id: "article", label: "深度长文", count: 12 },
+      { id: "project", label: "项目拆解", count: 8 },
+      { id: "story", label: "学员故事", count: 6 },
+    ]
+  },
+  {
+    title: "热门赛道",
+    icon: "🔥",
+    items: [
+      { id: "ai", label: "AI赚钱" },
+      { id: "wechat", label: "公众号" },
+      { id: "xiaohongshu", label: "小红书" },
+      { id: "douyin", label: "抖音" },
+      { id: "video", label: "视频号" },
+    ]
+  },
+  {
+    title: "变现方式",
+    icon: "💰",
+    items: [
+      { id: "traffic", label: "流量变现" },
+      { id: "knowledge", label: "知识付费" },
+      { id: "ecommerce", label: "电商带货" },
+      { id: "freelance", label: "自由职业" },
+    ]
+  }
+];
+---
+
+<aside class="category-sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-logo">💰</span>
+    <span class="sidebar-title">生财导航</span>
+  </div>
+  
+  {categoryGroups.map(group => (
+    <div class="category-group">
+      <h4 class="group-title">
+        <span class="group-icon">{group.icon}</span>
+        <span>{group.title}</span>
+      </h4>
+      <ul class="group-items">
+        {group.items.map(item => (
+          <li>
+            <a 
+              href={`/?category=${item.id}`}
+              class={`group-item ${activeCategory === item.id ? 'active' : ''}`}
+              data-category={item.id}
+            >
+              <span class="item-label">{item.label}</span>
+              {item.count && <span class="item-count">{item.count}</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  ))}
+</aside>
+
+<style>
+  .category-sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + var(--spacing-lg));
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-md);
+    max-height: calc(100vh - var(--header-height) - var(--spacing-2xl));
+    overflow-y: auto;
+  }
+  
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    margin: calc(-1 * var(--spacing-md));
+    margin-bottom: var(--spacing-md);
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  }
+  
+  .sidebar-logo {
+    font-size: 1.5rem;
+  }
+  
+  .sidebar-title {
+    font-weight: 700;
+    font-size: var(--text-base);
+    color: white;
+  }
+  
+  .category-group {
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .category-group:last-child {
+    margin-bottom: 0;
+  }
+  
+  .group-title {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+    padding: var(--spacing-xs) 0;
+  }
+  
+  .group-icon {
+    font-size: 0.875rem;
+  }
+  
+  .group-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  
+  .group-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+  }
+  
+  .group-item:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+  }
+  
+  .group-item.active {
+    background: rgba(255, 107, 53, 0.15);
+    color: var(--accent);
+  }
+  
+  .group-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 0 2px 2px 0;
+  }
+  
+  .item-count {
+    font-size: var(--text-xs);
+    padding: 2px 6px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+  }
+  
+  .group-item.active .item-count {
+    background: var(--accent);
+    color: white;
+  }
+  
+  /* Mobile: Hide sidebar */
+  @media (max-width: 1023px) {
+    .category-sidebar {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  // Handle category click for filtering
+  document.querySelectorAll('.group-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const category = item.getAttribute('data-category');
+      
+      // Update active state
+      document.querySelectorAll('.group-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+      
+      // Filter posts
+      const posts = document.querySelectorAll('.post-card');
+      posts.forEach(post => {
+        const postCategory = post.getAttribute('data-category');
+        const postTags = post.getAttribute('data-tags')?.split(',') || [];
+        
+        let shouldShow = category === 'all' || 
+                        postCategory === category ||
+                        postTags.includes(category);
+        
+        (post as HTMLElement).style.display = shouldShow ? '' : 'none';
+      });
+      
+      // Update tab if exists
+      const tabBtn = document.querySelector(`[data-category="${category}"]`);
+      if (tabBtn && tabBtn.classList.contains('tab-btn')) {
+        document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+        tabBtn.classList.add('active');
+      }
+    });
+  });
+</script>

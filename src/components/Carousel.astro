@@ -1,0 +1,236 @@
+---
+interface CarouselItem {
+  title: string;
+  description?: string;
+  link?: string;
+  tag?: string;
+}
+
+interface Props {
+  items?: CarouselItem[];
+}
+
+const defaultItems: CarouselItem[] = [
+  {
+    title: "新人必看：如何开始你的副业之路",
+    description: "零基础入门指南，手把手教你找到适合自己的赚钱方式",
+    link: "/articles/getting-started",
+    tag: "置顶"
+  },
+  {
+    title: "学员故事征集中",
+    description: "分享你的成长故事，让更多人看到你的进步",
+    link: "/stories",
+    tag: "活动"
+  },
+  {
+    title: "2024年最值得关注的副业方向",
+    description: "深度分析当下最有潜力的赚钱机会",
+    link: "/projects",
+    tag: "精选"
+  }
+];
+
+const { items = defaultItems } = Astro.props;
+---
+
+<div class="carousel">
+  <div class="carousel-track" id="carouselTrack">
+    {items.map((item, index) => (
+      <a href={item.link || "#"} class="carousel-slide" data-index={index}>
+        {item.tag && <span class="carousel-tag">{item.tag}</span>}
+        <h3 class="carousel-title">{item.title}</h3>
+        {item.description && <p class="carousel-desc">{item.description}</p>}
+      </a>
+    ))}
+  </div>
+  
+  <div class="carousel-controls">
+    <button class="carousel-btn carousel-prev" id="carouselPrev" aria-label="上一个">
+      <span>‹</span>
+    </button>
+    <div class="carousel-dots" id="carouselDots">
+      {items.map((_, index) => (
+        <button 
+          class={`carousel-dot ${index === 0 ? 'active' : ''}`} 
+          data-index={index}
+          aria-label={`第 ${index + 1} 页`}
+        ></button>
+      ))}
+    </div>
+    <button class="carousel-btn carousel-next" id="carouselNext" aria-label="下一个">
+      <span>›</span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .carousel {
+    position: relative;
+    background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    margin-bottom: var(--spacing-xl);
+  }
+  
+  .carousel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-secondary) 100%);
+  }
+  
+  .carousel-track {
+    display: flex;
+    transition: transform 0.4s ease;
+  }
+  
+  .carousel-slide {
+    flex: 0 0 100%;
+    padding: var(--spacing-xl);
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  .carousel-slide:hover .carousel-title {
+    color: var(--accent);
+  }
+  
+  .carousel-tag {
+    display: inline-block;
+    width: fit-content;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: rgba(255, 107, 53, 0.15);
+    color: var(--accent);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+  
+  .carousel-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    transition: color var(--transition-fast);
+  }
+  
+  @media (min-width: 768px) {
+    .carousel-title {
+      font-size: var(--text-xl);
+    }
+  }
+  
+  .carousel-desc {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: 1.6;
+  }
+  
+  .carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    padding-top: 0;
+  }
+  
+  .carousel-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    transition: all var(--transition-fast);
+  }
+  
+  .carousel-btn:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    border-color: var(--accent);
+  }
+  
+  .carousel-dots {
+    display: flex;
+    gap: var(--spacing-sm);
+  }
+  
+  .carousel-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+  }
+  
+  .carousel-dot:hover,
+  .carousel-dot.active {
+    background: var(--accent);
+    transform: scale(1.2);
+  }
+</style>
+
+<script>
+  const track = document.getElementById('carouselTrack');
+  const dots = document.querySelectorAll('.carousel-dot');
+  const prevBtn = document.getElementById('carouselPrev');
+  const nextBtn = document.getElementById('carouselNext');
+  
+  let currentIndex = 0;
+  const slideCount = dots.length;
+  let autoplayInterval: ReturnType<typeof setInterval>;
+  
+  function goToSlide(index: number) {
+    currentIndex = (index + slideCount) % slideCount;
+    if (track) {
+      track.style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIndex);
+    });
+  }
+  
+  function startAutoplay() {
+    autoplayInterval = setInterval(() => {
+      goToSlide(currentIndex + 1);
+    }, 5000);
+  }
+  
+  function stopAutoplay() {
+    clearInterval(autoplayInterval);
+  }
+  
+  prevBtn?.addEventListener('click', () => {
+    goToSlide(currentIndex - 1);
+    stopAutoplay();
+    startAutoplay();
+  });
+  
+  nextBtn?.addEventListener('click', () => {
+    goToSlide(currentIndex + 1);
+    stopAutoplay();
+    startAutoplay();
+  });
+  
+  dots.forEach((dot, index) => {
+    dot.addEventListener('click', () => {
+      goToSlide(index);
+      stopAutoplay();
+      startAutoplay();
+    });
+  });
+  
+  startAutoplay();
+</script>

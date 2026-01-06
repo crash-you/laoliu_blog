@@ -1,0 +1,68 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: Date;
+  tags?: string[];
+}
+
+const {
+  title = '老刘的生财之道',
+  description = '专注副业赚钱、个人成长，帮你找到属于自己的生财之道。深度长文、项目拆解、学员故事，实战分享成长路径。',
+  image = '/og-image.png',
+  type = 'website',
+  publishedTime,
+  tags = [],
+} = Astro.props;
+
+const siteUrl = Astro.site?.origin || 'https://laoliu.money';
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
+const ogImageUrl = image.startsWith('http') ? image : new URL(image, siteUrl).toString();
+---
+
+<!-- Primary Meta Tags -->
+<meta name="title" content={title} />
+<meta name="description" content={description} />
+<meta name="keywords" content={`副业,赚钱,个人成长,公众号,小红书,抖音,AI副业,${tags.join(',')}`} />
+<meta name="author" content="老刘" />
+<link rel="canonical" href={canonicalUrl} />
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:site_name" content="老刘的生财之道" />
+<meta property="og:locale" content="zh_CN" />
+{publishedTime && <meta property="article:published_time" content={publishedTime.toISOString()} />}
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonicalUrl} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": type === 'article' ? 'Article' : 'WebSite',
+  "name": title,
+  "description": description,
+  "url": canonicalUrl,
+  "image": ogImageUrl,
+  ...(type === 'article' && publishedTime ? {
+    "datePublished": publishedTime.toISOString(),
+    "author": {
+      "@type": "Person",
+      "name": "老刘"
+    }
+  } : {}),
+  "publisher": {
+    "@type": "Organization",
+    "name": "老刘的生财之道"
+  }
+})} />

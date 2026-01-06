@@ -8,7 +8,7 @@ export const SITE_DESCRIPTION = '深度长文 | 项目拆解 | 互联网赚钱�
 export const NAV_LINKS = [
   { href: '/', text: '首页' },
   { href: '/articles', text: '深度长文' },
-  { href: '/projects', text: '项目拆解' },
+  { href: '/projects', text: '搞钱SOP库' },
   { href: '/stories', text: '学员故事' },
   { href: '/about', text: '关于老刘' },
 ];

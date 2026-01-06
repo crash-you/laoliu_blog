@@ -1,0 +1,63 @@
+---
+// 后台管理页面
+// 访问 /admin 即可进入内容管理后台
+// 注意：此页面不会出现在网站导航中
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
+    <title>内容管理后台 - 老刘的生财之道</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      /* 自定义加载提示 */
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        z-index: 9999;
+      }
+      .loading-screen h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .loading-screen p {
+        opacity: 0.8;
+      }
+      .loading-screen.hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading-screen" id="loading">
+      <h1>📝 老刘的生财之道</h1>
+      <p>正在加载内容管理后台...</p>
+    </div>
+    
+    <script src="https://unpkg.com/decap-cms@^3.1.2/dist/decap-cms.js"></script>
+    <script>
+      // CMS 加载完成后隐藏 loading
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          document.getElementById('loading').classList.add('hidden');
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>
