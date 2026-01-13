@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>老刘博客管理后台</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="logo">
+                <span class="logo-icon">刘</span>
+                <span class="logo-text">管理后台</span>
+            </div>
+            <nav class="nav">
+                <a href="#" class="nav-item active" data-view="list" data-filter="all">
+                    <span class="nav-icon">📋</span>
+                    <span>全部内容</span>
+                </a>
+                <a href="#" class="nav-item" data-view="list" data-filter="articles">
+                    <span class="nav-icon">📝</span>
+                    <span>深度长文</span>
+                </a>
+                <a href="#" class="nav-item" data-view="list" data-filter="projects">
+                    <span class="nav-icon">🚀</span>
+                    <span>项目拆解</span>
+                </a>
+                <a href="#" class="nav-item" data-view="list" data-filter="stories">
+                    <span class="nav-icon">👥</span>
+                    <span>学员故事</span>
+                </a>
+                <div class="nav-divider"></div>
+                <a href="#" class="nav-item" data-view="list" data-filter="drafts">
+                    <span class="nav-icon">📦</span>
+                    <span>草稿箱</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="http://localhost:4321" target="_blank" class="nav-item">
+                    <span class="nav-icon">🌐</span>
+                    <span>查看网站</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main">
+            <!-- 列表视图 -->
+            <div id="listView" class="view active">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <h1 class="page-title">全部内容</h1>
+                        <span class="content-count">0 篇</span>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="btn btn-primary" id="btnNew">
+                            <span>+ 新建</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 批量操作栏 -->
+                <div class="batch-bar" id="batchBar">
+                    <div class="batch-info">
+                        <span>已选择 <strong id="selectedCount">0</strong> 项</span>
+                    </div>
+                    <div class="batch-actions">
+                        <button class="btn btn-outline" id="btnBatchDraft">设为草稿</button>
+                        <button class="btn btn-outline" id="btnBatchPublish">发布</button>
+                        <button class="btn btn-danger" id="btnBatchDelete">批量删除</button>
+                    </div>
+                    <button class="btn-close" id="btnCancelBatch">✕</button>
+                </div>
+
+                <!-- 内容列表 -->
+                <div class="content-list" id="contentList">
+                    <div class="list-header">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" id="selectAll">
+                            <span class="checkmark"></span>
+                        </label>
+                        <span class="col-title">标题</span>
+                        <span class="col-collection">分类</span>
+                        <span class="col-status">状态</span>
+                        <span class="col-date">日期</span>
+                        <span class="col-actions">操作</span>
+                    </div>
+                    <div class="list-body" id="listBody">
+                        <!-- 动态加载 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 编辑视图 -->
+            <div id="editView" class="view">
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <button class="btn btn-text" id="btnBack">← 返回</button>
+                        <h1 class="page-title" id="editTitle">新建内容</h1>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="btn btn-outline" id="btnSaveDraft">保存草稿</button>
+                        <button class="btn btn-primary" id="btnPublish">发布</button>
+                    </div>
+                </div>
+
+                <div class="editor-container">
+                    <div class="editor-main">
+                        <div class="form-group">
+                            <label>标题</label>
+                            <input type="text" id="inputTitle" placeholder="输入文章标题...">
+                        </div>
+                        <div class="form-group">
+                            <label>摘要</label>
+                            <textarea id="inputDesc" rows="2" placeholder="简要描述..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>正文 (Markdown)</label>
+                            <textarea id="inputBody" rows="20" placeholder="# 开始写作...
+
+支持 Markdown 格式：
+- **粗体** 和 *斜体*
+- # 一级标题
+- ## 二级标题
+- [链接](url)
+- ![图片](url)
+"></textarea>
+                        </div>
+                    </div>
+                    <div class="editor-sidebar">
+                        <div class="form-group">
+                            <label>分类</label>
+                            <select id="inputCollection">
+                                <option value="articles">深度长文</option>
+                                <option value="projects">项目拆解</option>
+                                <option value="stories">学员故事</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>子分类</label>
+                            <input type="text" id="inputSubCategory" placeholder="如：思维方法">
+                        </div>
+                        <div class="form-group">
+                            <label>标签</label>
+                            <div class="tags-input" id="tagsContainer">
+                                <input type="text" id="inputTag" placeholder="输入标签按回车添加">
+                            </div>
+                            <div class="tag-suggestions" id="tagSuggestions"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>封面图 URL</label>
+                            <input type="text" id="inputCover" placeholder="/images/uploads/xxx.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="inputPinned">
+                                <span>置顶文章</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 确认对话框 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">确认删除</h3>
+            <p id="modalMessage">确定要删除选中的内容吗？此操作不可撤销。</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="btnModalCancel">取消</button>
+                <button class="btn btn-danger" id="btnModalConfirm">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 通知 -->
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

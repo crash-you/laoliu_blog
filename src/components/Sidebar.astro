@@ -141,6 +141,21 @@ const { hotPosts = defaultHotPosts } = Astro.props;
       }
     </div>
   </div>
+
+  <!-- Admin Quick Access (only visible locally) -->
+  <div class="sidebar-card admin-card">
+    <h4 class="sidebar-title">📝 内容管理</h4>
+    <div class="admin-links">
+      <a href="/drafts" class="admin-link">
+        <span class="link-icon">📋</span>
+        <span class="link-text">草稿箱</span>
+      </a>
+      <a href="/admin" class="admin-link primary">
+        <span class="link-icon">⚙️</span>
+        <span class="link-text">后台管理</span>
+      </a>
+    </div>
+  </div>
 </aside>
 
 <style>
@@ -356,5 +371,57 @@ const { hotPosts = defaultHotPosts } = Astro.props;
   .no-tags {
     color: var(--text-muted);
     font-size: var(--text-sm);
+  }
+
+  /* Admin Card */
+  .admin-card {
+    background: linear-gradient(
+      135deg,
+      var(--bg-card) 0%,
+      rgba(59, 130, 246, 0.05) 100%
+    );
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+
+  .admin-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  .admin-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .admin-link:hover {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+  }
+
+  .admin-link.primary {
+    background: linear-gradient(135deg, var(--accent), #ff8c42);
+    color: white;
+  }
+
+  .admin-link.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.3);
+  }
+
+  .link-icon {
+    font-size: 1rem;
+  }
+
+  .link-text {
+    font-weight: 500;
   }
 </style>

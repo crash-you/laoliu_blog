@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "cms": "npx decap-server",
     "auto-commit": "node scripts/auto-commit.mjs",
+    "sync-tags": "node scripts/sync-tags.mjs",
     "dev:cms": "npx concurrently \"npm run dev\" \"npm run cms\"",
     "dev:auto": "npx concurrently \"npm run dev\" \"npm run cms\" \"npm run auto-commit\"",
     "build": "astro build && npx pagefind --site dist",
