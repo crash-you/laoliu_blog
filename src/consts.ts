@@ -1,8 +1,8 @@
 // 网站全局配置
 // 在此文件中集中管理网站的基本信息
 
-export const SITE_TITLE = '老刘的生财之道';
-export const SITE_DESCRIPTION = '深度长文 | 项目拆解 | 互联网赚钱方法论 - 沉淀知识，分享经验，助你找到属于自己的生财之道';
+export const SITE_TITLE = '老刘的思维笔记';
+export const SITE_DESCRIPTION = '归纳整理学习资料与笔记 - 沉淀知识，分享经验，记录个人成长历程';
 
 // 导航配置
 export const NAV_LINKS = [
