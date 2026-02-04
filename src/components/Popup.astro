@@ -5,10 +5,10 @@ interface Props {
   showContact?: boolean;
 }
 
-const { 
+const {
   title = "👋 欢迎来到老刘的生财之道！",
   content = "这里分享深度思考、项目拆解、学员故事，帮你找到属于自己的生财之道。关注公众号，获取更多干货内容！",
-  showContact = true
+  showContact = true,
 } = Astro.props;
 ---
 
@@ -17,36 +17,38 @@ const {
     <button class="popup-close" id="popupClose" aria-label="关闭">
       <span>×</span>
     </button>
-    
+
     <div class="popup-content">
       <h3 class="popup-title">{title}</h3>
       <p class="popup-text">{content}</p>
-      
-      {showContact && (
-        <div class="popup-contact">
-          <div class="contact-card">
-            <span class="contact-emoji">📱</span>
-            <div class="contact-info">
-              <span class="contact-label">微信号</span>
-              <span class="contact-value">laoliu_money</span>
+
+      {
+        showContact && (
+          <div class="popup-contact">
+            <div class="contact-card">
+              <span class="contact-emoji">📱</span>
+              <div class="contact-info">
+                <span class="contact-label">微信号</span>
+                <span class="contact-value">laoliu_money</span>
+              </div>
+            </div>
+            <div class="contact-card">
+              <span class="contact-emoji">📧</span>
+              <div class="contact-info">
+                <span class="contact-label">公众号</span>
+                <span class="contact-value">老刘的生财之道</span>
+              </div>
             </div>
           </div>
-          <div class="contact-card">
-            <span class="contact-emoji">📧</span>
-            <div class="contact-info">
-              <span class="contact-label">公众号</span>
-              <span class="contact-value">老刘的生财之道</span>
-            </div>
-          </div>
-        </div>
-      )}
-      
+        )
+      }
+
       <div class="popup-actions">
         <button class="btn btn-primary popup-confirm" id="popupConfirm">
           知道了，去看看内容
         </button>
       </div>
-      
+
       <label class="popup-noshow">
         <input type="checkbox" id="popupNoShow" />
         <span>今天不再显示</span>
@@ -70,38 +72,49 @@ const {
     transition: all var(--transition-normal);
     padding: var(--spacing-md);
   }
-  
+
   .popup-overlay.active {
     opacity: 1;
     visibility: visible;
   }
-  
+
   .popup {
     position: relative;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-xl);
-    max-width: 420px;
+    max-width: 90%;
     width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
     transform: scale(0.9) translateY(20px);
     transition: transform var(--transition-normal);
-    overflow: hidden;
   }
-  
+
+  @media (min-width: 480px) {
+    .popup {
+      max-width: 420px;
+    }
+  }
+
   .popup-overlay.active .popup {
     transform: scale(1) translateY(0);
   }
-  
+
   .popup::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-secondary) 100%);
+    background: linear-gradient(
+      90deg,
+      var(--accent) 0%,
+      var(--accent-secondary) 100%
+    );
   }
-  
+
   .popup-close {
     position: absolute;
     top: var(--spacing-md);
@@ -116,36 +129,50 @@ const {
     border-radius: var(--radius-md);
     transition: all var(--transition-fast);
   }
-  
+
   .popup-close:hover {
     background: var(--bg-secondary);
     color: var(--text-primary);
   }
-  
+
   .popup-content {
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
   }
-  
+
+  @media (min-width: 480px) {
+    .popup-content {
+      padding: var(--spacing-xl);
+    }
+  }
+
   .popup-title {
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
     margin-bottom: var(--spacing-md);
     padding-right: var(--spacing-xl);
+    word-break: break-word;
+    line-height: 1.4;
   }
-  
+
+  @media (min-width: 480px) {
+    .popup-title {
+      font-size: var(--text-xl);
+    }
+  }
+
   .popup-text {
     color: var(--text-secondary);
     font-size: var(--text-sm);
     line-height: 1.7;
     margin-bottom: var(--spacing-lg);
   }
-  
+
   .popup-contact {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-lg);
   }
-  
+
   .contact-card {
     display: flex;
     align-items: center;
@@ -155,37 +182,37 @@ const {
     border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
   }
-  
+
   .contact-emoji {
     font-size: 1.5rem;
   }
-  
+
   .contact-info {
     display: flex;
     flex-direction: column;
   }
-  
+
   .contact-label {
     font-size: var(--text-xs);
     color: var(--text-muted);
   }
-  
+
   .contact-value {
     font-size: var(--text-sm);
     font-weight: 600;
     color: var(--accent);
   }
-  
+
   .popup-actions {
     margin-bottom: var(--spacing-md);
   }
-  
+
   .popup-confirm {
     width: 100%;
     padding: var(--spacing-md);
     font-size: var(--text-base);
   }
-  
+
   .popup-noshow {
     display: flex;
     align-items: center;
@@ -195,24 +222,26 @@ const {
     font-size: var(--text-xs);
     cursor: pointer;
   }
-  
+
   .popup-noshow input {
     accent-color: var(--accent);
   }
 </style>
 
 <script>
-  const overlay = document.getElementById('popupOverlay');
-  const closeBtn = document.getElementById('popupClose');
-  const confirmBtn = document.getElementById('popupConfirm');
-  const noShowCheckbox = document.getElementById('popupNoShow') as HTMLInputElement;
-  
-  const POPUP_KEY = 'popup_hidden_until';
-  
+  const overlay = document.getElementById("popupOverlay");
+  const closeBtn = document.getElementById("popupClose");
+  const confirmBtn = document.getElementById("popupConfirm");
+  const noShowCheckbox = document.getElementById(
+    "popupNoShow",
+  ) as HTMLInputElement;
+
+  const POPUP_KEY = "popup_hidden_until";
+
   function hidePopup() {
-    overlay?.classList.remove('active');
-    document.body.style.overflow = '';
-    
+    overlay?.classList.remove("active");
+    document.body.style.overflow = "";
+
     if (noShowCheckbox?.checked) {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -220,25 +249,25 @@ const {
       localStorage.setItem(POPUP_KEY, tomorrow.getTime().toString());
     }
   }
-  
+
   function shouldShowPopup() {
     const hiddenUntil = localStorage.getItem(POPUP_KEY);
     if (!hiddenUntil) return true;
     return Date.now() >= parseInt(hiddenUntil);
   }
-  
+
   // Show popup after a short delay
   if (shouldShowPopup()) {
     setTimeout(() => {
-      overlay?.classList.add('active');
-      document.body.style.overflow = 'hidden';
+      overlay?.classList.add("active");
+      document.body.style.overflow = "hidden";
     }, 1500);
   }
-  
-  closeBtn?.addEventListener('click', hidePopup);
-  confirmBtn?.addEventListener('click', hidePopup);
-  
-  overlay?.addEventListener('click', (e) => {
+
+  closeBtn?.addEventListener("click", hidePopup);
+  confirmBtn?.addEventListener("click", hidePopup);
+
+  overlay?.addEventListener("click", (e) => {
     if (e.target === overlay) hidePopup();
   });
 </script>

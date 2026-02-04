@@ -36,6 +36,9 @@ const navLinks = [
     </div>
   </div>
 
+  <!-- Mobile Menu Backdrop -->
+  <div class="mobile-menu-backdrop" id="mobileMenuBackdrop"></div>
+
   <!-- Mobile Menu -->
   <div class="mobile-menu" id="mobileMenu">
     <nav class="mobile-nav">
@@ -214,8 +217,8 @@ const navLinks = [
     position: fixed;
     top: var(--header-height);
     right: 0;
-    width: 280px;
-    max-width: 80vw;
+    width: 70%;
+    max-width: 280px;
     height: calc(100vh - var(--header-height));
     background: var(--bg-primary);
     padding: var(--spacing-xl);
@@ -224,6 +227,7 @@ const navLinks = [
     z-index: 99;
     box-shadow: -4px 0 20px rgba(0, 0, 0, 0.3);
     overflow-y: auto;
+    border-left: 1px solid var(--border-color);
   }
 
   .mobile-menu.active {
@@ -250,17 +254,48 @@ const navLinks = [
     background: var(--bg-card);
     color: var(--text-primary);
   }
+
+  .mobile-menu-backdrop {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-normal);
+    z-index: 98;
+  }
+
+  .mobile-menu-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+  }
 </style>
 
 <script>
   const menuToggle = document.getElementById("menuToggle");
   const mobileMenu = document.getElementById("mobileMenu");
+  const mobileMenuBackdrop = document.getElementById("mobileMenuBackdrop");
 
-  menuToggle?.addEventListener("click", () => {
-    menuToggle.classList.toggle("active");
+  function toggleMenu() {
+    menuToggle?.classList.toggle("active");
     mobileMenu?.classList.toggle("active");
+    mobileMenuBackdrop?.classList.toggle("active");
     document.body.style.overflow = mobileMenu?.classList.contains("active")
       ? "hidden"
       : "";
-  });
+  }
+
+  function closeMenu() {
+    menuToggle?.classList.remove("active");
+    mobileMenu?.classList.remove("active");
+    mobileMenuBackdrop?.classList.remove("active");
+    document.body.style.overflow = "";
+  }
+
+  menuToggle?.addEventListener("click", toggleMenu);
+  mobileMenuBackdrop?.addEventListener("click", closeMenu);
 </script>
